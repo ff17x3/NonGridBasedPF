@@ -16,6 +16,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private Map map;
     private DrawFrame frame;
     private util.ClockNano clock;
+    private PointF startP = null, endP = null;
 
     public static void main(String args[]) {
         try {
@@ -37,6 +38,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
+
     }
 
     @Override
@@ -45,6 +47,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                float scale = frame.getScale();
+                if (startP == null)
+                    startP = new PointF(e.getX() / scale, e.getY() / scale);
+                else if (endP == null)
+                    endP = new PointF(e.getX() / scale, e.getY() / scale);
             }
         });
     }
