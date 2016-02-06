@@ -35,7 +35,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
 
     }
-//..
+
+    //..
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
@@ -78,6 +79,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
                         if (startP != null && endP != null) {
+                            genKnots();
                             finishMatrix();
                             algorithm();
                         }
@@ -85,6 +87,17 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 }
             }
         });
+    }
+
+    private void genKnots() {
+        knots = new Knot[map.obstacles.length * 4];
+        int i = 0;
+        for (Obstacle o : map.obstacles) {
+            knots[i++] = new Knot(new PointF(o.x, o.y), o);
+            knots[i++] = new Knot(new PointF(o.x + o.width, o.y), o);
+            knots[i++] = new Knot(new PointF(o.x + o.width, o.y + o.height), o);
+            knots[i++] = new Knot(new PointF(o.x, o.y + o.height), o);
+        }
     }
 
     private void finishMatrix() {
