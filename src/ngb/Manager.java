@@ -1,15 +1,54 @@
 package ngb;
 
+
+import util.ClockNano;
+import util.DimensionF;
+import util.DrawFrame;
+import util.DrawInferface;
+import util.FrameInitInterface;
+import util.Tickable;
+
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Created by Florian on 06.02.2016.
  */
-public class Manager {
+public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
-    public static void main(){
-        
+    private Map map;
+    private DrawFrame frame;
+    private util.ClockNano clock;
+
+    public static void main(String args[]) {
+        try {
+            new Manager("map1.txt");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public Manager(){
+    public Manager(String mapFile) throws Exception {
+        map = Map.readMap(mapFile);
+        frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
+        clock = new ClockNano(60, this);
+    }
 
+    @Override
+    public void draw(Graphics g, float scale) {
+        for (Obstacle o : map.obstacles) {
+            o.draw(g, scale);
+        }
+    }
+
+    @Override
+    public void initFrame(JFrame f, DrawFrame.DrawPanel dp) {
+
+    }
+
+    @Override
+    public void tick(int millisDelta) {
+        frame.redraw();
     }
 }
