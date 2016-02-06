@@ -17,7 +17,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private DrawFrame frame;
     private util.ClockNano clock;
 
-    // hallo
+    // hallo2
     public static void main(String args[]) {
         try {
             new Manager("map2.txt");
@@ -26,7 +26,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
 
     }
-//.
+
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
