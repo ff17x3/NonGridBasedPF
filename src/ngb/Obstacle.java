@@ -12,10 +12,10 @@ public class Obstacle {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+
 	}
 
 	public static Obstacle createFromFile(String line) {
-
 		Scanner sc = new Scanner(line);
 		float x, y, width, height;
 		x = Float.parseFloat(sc.next());
@@ -30,6 +30,7 @@ public class Obstacle {
 	public void draw(Graphics g, float scale) {
 		g.setColor(Color.BLACK);
 		g.fillRect(Math.round(x * scale), Math.round(y * scale), Math.round(width*scale), Math.round(height*scale));
+
 	}
 
 }
