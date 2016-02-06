@@ -1,7 +1,5 @@
 package ngb;
 
-import util.DrawFrame;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -11,7 +9,7 @@ import java.util.Scanner;
  */
 public class Map {
 
-    public static final int TYPE_OBSTACLE = 1;
+    public static final int TYPE_OBSTACLE = 0;
 
     public final Obstacle[] obstacles;
     public final float mapWidth, mapHeight;
