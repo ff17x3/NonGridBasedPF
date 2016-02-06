@@ -21,6 +21,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private util.ClockNano clock;
     private PointF startP = null, endP = null;
 
+    private int startEndCircSize = 10;
+
     public static void main(String args[]) {
         try {
             new Manager("map2.txt");
@@ -33,7 +35,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
-        clock = new ClockNano(60, this);
+//        clock = new ClockNano(60, this);
+//        clock.startTicking();
     }
 
     @Override
@@ -42,8 +45,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             o.draw(g, scale);
         }
         g.setColor(new Color(0xff0000));
-        g.fillOval(round(startP.x * scale), round(startP.y * scale), 10, 10);
-        g.fillOval(round(endP.x * scale), round(endP.y * scale), 10, 10);
+        if (startP != null) {
+            g.fillOval(round(startP.x * scale) - startEndCircSize / 2, round(startP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+            if (endP != null)
+                g.fillOval(round(endP.x * scale) - startEndCircSize / 2, round(endP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+        }
     }
 
     @Override
@@ -53,14 +59,19 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 float scale = frame.getScale();
+                System.out.println("clicked " + e.getX() + ", " + e.getY() + " (scale = " + scale + ")");
                 if (startP == null)
                     startP = new PointF(e.getX() / scale, e.getY() / scale);
                 else if (endP == null)
                     endP = new PointF(e.getX() / scale, e.getY() / scale);
+                frame.redraw();
             }
         });
     }
 
+    /**
+     * UNUSED!!!!
+     */
     @Override
     public void tick(int millisDelta) {
         frame.redraw();
