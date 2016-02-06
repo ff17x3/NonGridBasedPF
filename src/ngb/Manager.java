@@ -77,17 +77,25 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 super.keyTyped(e);
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-                        algorithm();
+                        if (startP != null && endP != null) {
+                            finishMatrix();
+                            algorithm();
+                        }
                         break;
                 }
             }
         });
     }
 
+    private void finishMatrix() {
+
+    }
+
     private void algorithm() {
         System.out.println("Starting algorithm..");
         long time = System.nanoTime();
         // START
+        // heuristic
 
         // END
         System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) / 1e-6 + "ms");
