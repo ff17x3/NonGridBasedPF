@@ -23,6 +23,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private util.ClockNano clock;
     private PointF startP = null, endP = null;
 
+    private Knot[] knots;
+
     private int startEndCircSize = 10;
 
     public static void main(String args[]) {

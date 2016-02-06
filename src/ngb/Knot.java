@@ -2,14 +2,17 @@ package ngb;
 
 import util.PointF;
 
+import java.util.ArrayList;
+
 /**
  * Created by Florian on 06.02.2016.
  */
 public class Knot {
 
-
-    private final PointF pos;
-    private final Obstacle o;
+    private float heuristic;
+    private ArrayList<Knot> neighbors = new ArrayList<>();
+    public final PointF pos;
+    public final Obstacle o;
 
 
     public Knot(PointF pos, Obstacle o) {
@@ -17,12 +20,15 @@ public class Knot {
         this.o = o;
     }
 
-    public PointF getPos() {
-        return pos;
+    public void addNeighbor(Knot k) {
+        neighbors.add(k);
     }
 
-    public Obstacle getO() {
-        return o;
+    public void setHeuristic(float heuristic) {
+        this.heuristic = heuristic;
     }
 
+    public float getHeuristic() {
+        return heuristic;
+    }
 }
