@@ -86,11 +86,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     private void algorithm() {
         System.out.println("Starting algorithm..");
-        long time = System.currentTimeMillis();
+        long time = System.nanoTime();
         // START
 
         // END
-        System.out.println("Algorithm finished, required time: " + String.valueOf(System.currentTimeMillis() - time) + "ms");
+        System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) / 1e-6 + "ms");
     }
 
     /**
