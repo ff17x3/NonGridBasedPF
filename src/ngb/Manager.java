@@ -24,6 +24,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private PointF startP = null, endP = null;
 
     private Knot[] knots;
+    private Knot startK, endK;
 
     private int startEndCircSize = 10;
 
@@ -95,8 +96,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         System.out.println("Starting algorithm..");
         long time = System.nanoTime();
         // START
-        // heuristic
-
+        // heuristic, linear
+        for (Knot k : knots) {
+            float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
+            k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
+        }
         // END
         System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) / 1e-6 + "ms");
     }
