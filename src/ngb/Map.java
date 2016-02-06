@@ -1,5 +1,7 @@
 package ngb;
 
+import util.DrawFrame;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -18,10 +20,11 @@ public class Map {
         obstacles = obs;
         mapWidth = width;
         mapHeight = height;
+
     }
 
     public static Map readMap(String filename) throws Exception {
-        try (Scanner reader = new Scanner(new File(filename));) {
+        try (Scanner reader = new Scanner(new File(filename))) {
             int anzObstacles, i = 0;
 
             float mapWidth = Integer.parseInt(reader.next());
@@ -46,7 +49,7 @@ public class Map {
             return new Map(obstacles, mapWidth, mapHeight);
 
         } catch (FileNotFoundException e) {
-            throw e;
+            throw new Exception("Invalid map file!",e);
         }
     }
 }
