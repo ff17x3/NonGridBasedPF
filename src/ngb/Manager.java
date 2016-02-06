@@ -94,10 +94,18 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         knots = new Knot[map.obstacles.length * 4];
         int i = 0;
         for (Obstacle o : map.obstacles) {
-            knots[i++] = new Knot(new PointF(o.x, o.y), o);
-            knots[i++] = new Knot(new PointF(o.x + o.width, o.y), o);
-            knots[i++] = new Knot(new PointF(o.x + o.width, o.y + o.height), o);
-            knots[i++] = new Knot(new PointF(o.x, o.y + o.height), o);
+            knots[i] = new Knot(new PointF(o.x, o.y), o);
+            knots[i + 1] = new Knot(new PointF(o.x + o.width, o.y), o);
+            knots[i + 2] = new Knot(new PointF(o.x + o.width, o.y + o.height), o);
+            knots[i + 3] = new Knot(new PointF(o.x, o.y + o.height), o);
+
+            knots[i].addNeighborBoth(knots[i + 1]);
+            knots[i].addNeighborBoth(knots[i + 3]);
+
+            knots[i + 2].addNeighborBoth(knots[i + 1]);
+            knots[i + 2].addNeighborBoth(knots[i + 3]);
+
+            i += 4;
         }
     }
 

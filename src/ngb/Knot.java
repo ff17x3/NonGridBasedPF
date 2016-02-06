@@ -24,6 +24,11 @@ public class Knot {
         neighbors.add(k);
     }
 
+    public void addNeighborBoth(Knot k) {
+        neighbors.add(k);
+        k.addNeighbor(this);
+    }
+
     public void setHeuristic(float heuristic) {
         this.heuristic = heuristic;
     }
