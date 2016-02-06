@@ -25,7 +25,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
 
     }
-
+//..
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
