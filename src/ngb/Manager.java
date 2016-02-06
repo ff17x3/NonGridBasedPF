@@ -5,7 +5,9 @@ package ngb;
  */
 public class Manager {
 
-    public static void main()
+    public static void main(){
+        
+    }
 
     public Manager(){
 
