@@ -9,7 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Created by Florian on 06.02.2016.
+ * Created by Florian on 06.02.2016. and max ARRRRRRGH!!!
  */
 public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
@@ -17,7 +17,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private DrawFrame frame;
     private util.ClockNano clock;
 
-    // hallo5
     public static void main(String args[]) {
         try {
             new Manager("map2.txt");
@@ -26,7 +25,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
 
     }
-//flo
+
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
