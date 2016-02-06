@@ -99,7 +99,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         // heuristic
 
         // END
-        System.out.println("Algorithm finished, required time: " + String.valueOf(System.currentTimeMillis() - time) + "ms");
+        System.out.println("Algorithm finished, required time: " + (System.currentTimeMillis() - time) + "ms");
     }
 
     /**
