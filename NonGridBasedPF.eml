@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inherit-compiler-output="true" inheritJdk="true">
+	<output-test url="file://$MODULE_DIR$/out/test/NonGridBasedPF"/>
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="Tools" scope="COMPILE">
+		<srcroot url="file://$MODULE_DIR$/../Tools/src"/>
+	</lib>
+</component>

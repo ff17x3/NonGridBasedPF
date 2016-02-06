@@ -1,12 +1,7 @@
 package ngb;
 
 
-import util.ClockNano;
-import util.DimensionF;
-import util.DrawFrame;
-import util.DrawInferface;
-import util.FrameInitInterface;
-import util.Tickable;
+import util.*;
 
 import javax.swing.*;
 import java.awt.*;
