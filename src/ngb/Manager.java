@@ -35,7 +35,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
 
     }
-//..
+
+    //..
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
@@ -77,17 +78,25 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 super.keyTyped(e);
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-                        algorithm();
+                        if (startP != null && endP != null) {
+                            finishMatrix();
+                            algorithm();
+                        }
                         break;
                 }
             }
         });
     }
 
+    private void finishMatrix() {
+
+    }
+
     private void algorithm() {
         System.out.println("Starting algorithm..");
         long time = System.currentTimeMillis();
         // START
+        // heuristic
 
         // END
         System.out.println("Algorithm finished, required time: " + String.valueOf(System.currentTimeMillis() - time) + "ms");
