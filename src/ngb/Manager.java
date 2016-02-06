@@ -5,6 +5,8 @@ import util.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -67,6 +69,26 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 frame.redraw();
             }
         });
+        dp.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_SPACE:
+                        algorithm();
+                        break;
+                }
+            }
+        });
+    }
+
+    private void algorithm() {
+        System.out.println("Starting algorithm..");
+        long time = System.currentTimeMillis();
+        // START
+
+        // END
+        System.out.println("Algorithm finished, required time: " + String.valueOf(System.currentTimeMillis() - time) + "ms");
     }
 
     /**
