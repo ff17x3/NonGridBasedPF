@@ -17,6 +17,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private DrawFrame frame;
     private util.ClockNano clock;
 
+    // hallo
     public static void main(String args[]) {
         try {
             new Manager("map2.txt");
