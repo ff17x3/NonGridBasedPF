@@ -8,6 +8,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static java.lang.Math.round;
+
+
 /**
  * Created by Florian on 06.02.2016. and max ARRRRRRGH!!!
  */
@@ -38,7 +41,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
-
+        g.setColor(new Color(0xff0000));
+        g.fillOval(round(startP.x * scale), round(startP.y * scale), 10, 10);
+        g.fillOval(round(endP.x * scale), round(endP.y * scale), 10, 10);
     }
 
     @Override
