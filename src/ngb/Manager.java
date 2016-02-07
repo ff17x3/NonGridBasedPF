@@ -59,6 +59,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     @Override
     public void draw(Graphics g, float scale) {
         // draw obstacles
+        g.setColor(new Color(0xFFFFFF));
+        g.fillRect(0, 0, round(map.mapWidth * scale), round(map.mapHeight * scale));
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
@@ -99,9 +101,10 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 super.mouseClicked(e);
                 float scale = frame.getScale();
                 System.out.println("clicked " + e.getX() + ", " + e.getY() + " (scale = " + scale + ")");
-                if (startP == null || (startP != null && endP != null))
+                if (startP == null || (startP != null && endP != null)) {
                     startP = new PointF(e.getX() / scale, e.getY() / scale);
-                else
+                    endP = null;
+                } else
                     endP = new PointF(e.getX() / scale, e.getY() / scale);
                 frame.redraw();
             }
