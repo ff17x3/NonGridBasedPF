@@ -99,9 +99,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 super.mouseClicked(e);
                 float scale = frame.getScale();
                 System.out.println("clicked " + e.getX() + ", " + e.getY() + " (scale = " + scale + ")");
-                if (startP == null)
+                if (startP == null || (startP != null && endP != null))
                     startP = new PointF(e.getX() / scale, e.getY() / scale);
-                else if (endP == null)
+                else
                     endP = new PointF(e.getX() / scale, e.getY() / scale);
                 frame.redraw();
             }
