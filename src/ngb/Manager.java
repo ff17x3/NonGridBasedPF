@@ -105,8 +105,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     }
 
     private void genKnots() {
-        knots = new Knot[map.obstacles.length * 4];
+        ArrayList<Knot> knotsList = new ArrayList<>(map.obstacles.length * 4);
         int i = 0;
+        Knot k1, k2, k3, k4;
         for (Obstacle o : map.obstacles) {
             boolean btl = true, btr = true, bbr = true, bbl = true;
             PointF tl = new PointF(o.x, o.y),
@@ -114,12 +115,27 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     br = new PointF(o.x + o.width, o.y + o.height),
                     bl = new PointF(o.x, o.y + o.height);
             for (int j = 0; j < map.obstacles.length; j++) {
-                if (btl && between(tl.x, ))
+                Obstacle oTest = map.obstacles[j];
+                if (btl && (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)))
+                    btl = false;
+                if (btr && (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tl, oTest.x, oTest.y, oTest.height)))
+                    btr = false;
+                if (bbr && (isNearHorz(tl, oTest.y, oTest.x, oTest.width) || isNearVert(tl, oTest.x, oTest.y, oTest.height)))
+                    bbr = false;
+                if (bbl && (isNearHorz(tl, oTest.y, oTest.x, oTest.width) || isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)))
+                    bbl = false;
+
             }
-            knots[i] = new Knot(tl, o);
-            knots[i + 1] = new Knot(tr, o);
-            knots[i + 2] = new Knot(br, o);
-            knots[i + 3] = new Knot(bl, o);
+            if (btl) {
+                k1 = new Knot(tl, o);
+                knotsList.add(k1);
+            }
+            if (btr) {
+                k2 = new Knot(tr, o);
+                knotsList.add(k2);
+            }
+            k3 = new Knot(br, o);
+            k4 = new Knot(bl, o);
 
 
             //TODO überprüfen, ob Knoten erreichbar sind
@@ -131,6 +147,16 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
             i += 4;
         }
+    }
+
+    private boolean isNearHorz(PointF p, float yLine, float xStart, float width) {
+        return (between(p.x, xStart - MIN_PATH_WIDTH, xStart + width + MIN_PATH_WIDTH)
+                && between(p.y, yLine - MIN_PATH_WIDTH, yLine + MIN_PATH_WIDTH));
+    }
+
+    private boolean isNearVert(PointF p, float xLine, float yStart, float height) {
+        return (between(p.x, xLine - MIN_PATH_WIDTH, xLine + MIN_PATH_WIDTH)
+                && between(p.y, yStart - MIN_PATH_WIDTH, yStart + height + MIN_PATH_WIDTH));
     }
 
     private void finishMatrix() {
