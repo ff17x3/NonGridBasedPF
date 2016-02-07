@@ -30,7 +30,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     private Node[] nodes;
     private float[][] movementCosts; // TODO indices: startN = length - 2 und endN = length - 1
-    private Node startN, endN;
+    private Node startN, endN, wayAnchor = null;
 
     private int startEndCircSize = 10;
 
@@ -61,12 +61,14 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
+        // draw start/end
         g.setColor(new Color(0xff0000));
         if (startP != null) {
             g.fillOval(round(startP.x * scale) - startEndCircSize / 2, round(startP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
             if (endP != null)
                 g.fillOval(round(endP.x * scale) - startEndCircSize / 2, round(endP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
         }
+        // draw nodes
         if (nodes != null)
             for (Node k : nodes) {
                 g.fillOval(round(k.pos.x * scale) - startEndCircSize / 2, round(k.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
@@ -74,6 +76,16 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 for (Node kNeighbor : nb)
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
+        // draw way
+        if (wayAnchor != null) {
+            g.setColor(new Color(0x0000FF));
+            Node l = null;
+            for (Node n = wayAnchor; n != null; n = n.getParent()) {
+                g.fillOval(round(n.pos.x * scale) - startEndCircSize / 2, round(n.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+                if (l != null)
+                    g.drawLine(round(n.pos.x * scale), round(n.pos.y * scale), round(l.pos.x * scale), round(l.pos.y * scale));
+            }
+        }
     }
 
     @Override
@@ -103,9 +115,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                             long time = System.nanoTime();
                             genNodes();
                             finishMatrix();
-                            algorithm();
+                            wayAnchor = algorithm();
                             System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
-
+                            dp.repaint();
                         }
                         break;
                 }
