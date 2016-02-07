@@ -362,7 +362,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (Node k : nodes) {
             float dX = k.pos.x - startP.x, dY = k.pos.y - startP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
-            System.out.println("bl");
         }
         // a*-Algorithm
         TreeMap<Float, Node> openList = new TreeMap<>();
