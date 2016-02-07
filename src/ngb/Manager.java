@@ -36,7 +36,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map2.txt");
+            new Manager("map3.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,17 +58,12 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     @Override
     public void draw(Graphics g, float scale) {
+        // draw obstacles
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
-        // draw start/end
-        g.setColor(new Color(0xff0000));
-        if (startP != null) {
-            g.fillOval(round(startP.x * scale) - startEndCircSize / 2, round(startP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
-            if (endP != null)
-                g.fillOval(round(endP.x * scale) - startEndCircSize / 2, round(endP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
-        }
         // draw nodes
+        g.setColor(new Color(0xFF0000));
         if (nodes != null)
             for (Node k : nodes) {
                 g.fillOval(round(k.pos.x * scale) - startEndCircSize / 2, round(k.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
@@ -76,14 +71,22 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 for (Node kNeighbor : nb)
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
+        // draw start/end
+        g.setColor(new Color(0xFF00FF));
+        if (startP != null) {
+            g.fillOval(round(startP.x * scale) - startEndCircSize / 2, round(startP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+            if (endP != null)
+                g.fillOval(round(endP.x * scale) - startEndCircSize / 2, round(endP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+        }
         // draw way
         if (wayAnchor != null) {
             g.setColor(new Color(0x0000FF));
             Node l = null;
             for (Node n = wayAnchor; n != null; n = n.getParent()) {
-                g.fillOval(round(n.pos.x * scale) - startEndCircSize / 2, round(n.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+                g.drawOval(round(n.pos.x * scale) - startEndCircSize / 2, round(n.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
                 if (l != null)
                     g.drawLine(round(n.pos.x * scale), round(n.pos.y * scale), round(l.pos.x * scale), round(l.pos.y * scale));
+                l = n;
             }
         }
     }
@@ -116,6 +119,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                             genNodes();
                             finishMatrix();
                             wayAnchor = algorithm();
+                            System.out.println("is wayAnchor null? " + (wayAnchor == null));
                             System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
                             dp.repaint();
                         }
@@ -216,8 +220,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     movementCosts[n.getMatrixIndex()][nb.getMatrixIndex()] = mc;
                     movementCosts[nb.getMatrixIndex()][n.getMatrixIndex()] = mc;
                 }
-
-
     }
 
     private void connectToAllInView(Node kStart, java.util.List<Node> rest) {
@@ -355,13 +357,12 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
         }
-        // TODO MATRIX ANPASSEN
-
         // a*-Algorithm
         TreeMap<Float, Node> openList = new TreeMap<>();
         HashSet<Node> closedList = new HashSet<>();
 
-        Node currNode = endN;
+        Node currNode;
+        openList.put(0f, endN);
         while (!openList.isEmpty()) {
             currNode = openList.remove(openList.firstKey());
             if (currNode == startN) {
