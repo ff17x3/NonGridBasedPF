@@ -20,6 +20,10 @@ public class Knot {
         this.o = o;
     }
 
+    public boolean isOn(float x, float y) {
+        return x == pos.x && y == pos.y;
+    }
+
     public void addNeighbor(Knot k) {
         neighbors.add(k);
     }
@@ -27,6 +31,10 @@ public class Knot {
     public void addNeighborBoth(Knot k) {
         neighbors.add(k);
         k.addNeighbor(this);
+    }
+
+    public ArrayList<Knot> getNeighbors() {
+        return neighbors;
     }
 
     public void setHeuristic(float heuristic) {
