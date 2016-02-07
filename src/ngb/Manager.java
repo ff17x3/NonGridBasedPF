@@ -107,7 +107,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
-                System.out.println("keyEvent: '" + e.getKeyChar() + "'");
+                System.out.println("KeyChar: '" + e.getKeyChar() + "'" + " keyCode:" + e.getKeyCode());
                 switch (e.getKeyChar()) {
                     case ' ':
                         if (startP != null && endP != null) {
@@ -336,6 +336,20 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         endN = new Node(endP, null);
         connectToAllInView(startN, nodes);
         connectToAllInView(endN, nodes);
+        float mc;
+        int startIndex = movementCosts.length - 2;
+        int endIndex = movementCosts.length - 1;
+        for (Node nb : startN.getNeighbors()) {
+            mc = (float) Math.sqrt(Math.pow(startP.x - nb.pos.x, 2) + Math.pow(startP.y - nb.pos.y, 2));
+            movementCosts[startIndex][nb.getMatrixIndex()] = mc;
+            movementCosts[nb.getMatrixIndex()][startIndex] = mc;
+        }
+        for (Node nb : endN.getNeighbors()) {
+            mc = (float) Math.sqrt(Math.pow(endP.x - nb.pos.x, 2) + Math.pow(endP.y - nb.pos.y, 2));
+            movementCosts[endIndex][nb.getMatrixIndex()] = mc;
+            movementCosts[nb.getMatrixIndex()][endIndex] = mc;
+        }
+
         // heuristic, linear
         for (Node k : nodes) {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
