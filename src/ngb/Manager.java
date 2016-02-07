@@ -26,8 +26,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private util.ClockNano clock;
     private PointF startP = null, endP = null;
 
-    private Knot[] knots;
-    private Knot startK, endK;
+    private Node[] nodes;
+    private Node startK, endK;
 
     private int startEndCircSize = 10;
 
@@ -59,10 +59,10 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             if (endP != null)
                 g.fillOval(round(endP.x * scale) - startEndCircSize / 2, round(endP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
         }
-        if (knots != null)
-            for (Knot k : knots) {
-                ArrayList<Knot> nb = k.getNeighbors();
-                for (Knot kNeighbor : nb)
+        if (nodes != null)
+            for (Node k : nodes) {
+                ArrayList<Node> nb = k.getNeighbors();
+                for (Node kNeighbor : nb)
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
     }
@@ -92,7 +92,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                         if (startP != null && endP != null) {
                             System.out.println("Starting algorithm..");
                             long time = System.nanoTime();
-                            genKnots();
+                            genNodes();
                             finishMatrix();
                             algorithm();
                             System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
@@ -104,10 +104,10 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         });
     }
 
-    private void genKnots() {
-        ArrayList<Knot> knotsList = new ArrayList<>(map.obstacles.length * 4);
+    private void genNodes() {
+        ArrayList<Node> nodeList = new ArrayList<>(map.obstacles.length * 4);
         int i = 0;
-        Knot k1, k2, k3, k4;
+        Node k1, k2, k3, k4;
         for (Obstacle o : map.obstacles) {
             boolean btl = true, btr = true, bbr = true, bbl = true;
             PointF tl = new PointF(o.x, o.y),
@@ -127,23 +127,29 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
             }
             if (btl) {
-                k1 = new Knot(tl, o);
-                knotsList.add(k1);
+                k1 = new Node(tl, o);
+                nodeList.add(k1);
             }
             if (btr) {
-                k2 = new Knot(tr, o);
-                knotsList.add(k2);
+                k2 = new Node(tr, o);
+                nodeList.add(k2);
             }
-            k3 = new Knot(br, o);
-            k4 = new Knot(bl, o);
+            if (bbr) {
+                k3 = new Node(br, o);
+                nodeList.add(k3);
+            }
+            if (bbl) {
+                k4 = new Node(bl, o);
+                nodeList.add(k4);
+            }
 
 
             //TODO überprüfen, ob Knoten erreichbar sind
-            knots[i].addNeighborBoth(knots[i + 1]);
-            knots[i].addNeighborBoth(knots[i + 3]);
+            nodes[i].addNeighborBoth(nodes[i + 1]);
+            nodes[i].addNeighborBoth(nodes[i + 3]);
 
-            knots[i + 2].addNeighborBoth(knots[i + 1]);
-            knots[i + 2].addNeighborBoth(knots[i + 3]);
+            nodes[i + 2].addNeighborBoth(nodes[i + 1]);
+            nodes[i + 2].addNeighborBoth(nodes[i + 3]);
 
             i += 4;
         }
@@ -160,16 +166,16 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     }
 
     private void finishMatrix() {
-        java.util.List<Knot> rest = new ArrayList<>(knots.length);
-        for (int i = knots.length - 1; i >= 0; i--)
-            rest.add(knots[i]);
+        java.util.List<Node> rest = new ArrayList<>(nodes.length);
+        for (int i = nodes.length - 1; i >= 0; i--)
+            rest.add(nodes[i]);
 //        for (int i = 0; i < map.obstacles.length; i++) {
         int i = 0;
         float dx, dy;
         boolean hits = false;
-        for (Knot kStart : knots) {
+        for (Node kStart : nodes) {
             Obstacle oStart = kStart.o;
-            for (Knot kEnd : rest) {
+            for (Node kEnd : rest) {
                 Obstacle oEnd = kEnd.o;
                 if (oStart == oEnd)
                     continue;
@@ -213,7 +219,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     hits = false;
             }
             //(map.obstacles.length - 1 - i) should be the index of kStart
-            rest.remove(knots.length - 1 - i);
+            rest.remove(nodes.length - 1 - i);
             i++;
         }
     }
@@ -277,7 +283,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
 
         // heuristic, linear
-        for (Knot k : knots) {
+        for (Node k : nodes) {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
         }

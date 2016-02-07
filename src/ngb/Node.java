@@ -7,15 +7,15 @@ import java.util.ArrayList;
 /**
  * Created by Florian on 06.02.2016.
  */
-public class Knot {
+public class Node {
 
     private float heuristic;
-    private ArrayList<Knot> neighbors = new ArrayList<>();
+    private ArrayList<Node> neighbors = new ArrayList<>();
     public final PointF pos;
     public final Obstacle o;
 
 
-    public Knot(PointF pos, Obstacle o) {
+    public Node(PointF pos, Obstacle o) {
         this.pos = pos;
         this.o = o;
     }
@@ -24,16 +24,16 @@ public class Knot {
         return x == pos.x && y == pos.y;
     }
 
-    public void addNeighbor(Knot k) {
+    public void addNeighbor(Node k) {
         neighbors.add(k);
     }
 
-    public void addNeighborBoth(Knot k) {
+    public void addNeighborBoth(Node k) {
         neighbors.add(k);
         k.addNeighbor(this);
     }
 
-    public ArrayList<Knot> getNeighbors() {
+    public ArrayList<Node> getNeighbors() {
         return neighbors;
     }
 
