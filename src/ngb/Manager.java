@@ -9,7 +9,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeMap;
 
 import static java.lang.Math.round;
 
@@ -149,8 +151,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 nodeList.add(k4);
             }
 
-
-            //TODO überprüfen, ob Knoten erreichbar sind
             if (btl) {
                 if (btr)
                     k1.addNeighborBoth(k2);
@@ -182,15 +182,30 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         java.util.List<Node> rest = new ArrayList<>(nodes.length);
         for (int i = nodes.length - 1; i >= 0; i--)
             rest.add(nodes[i]);
-//        for (int i = 0; i < map.obstacles.length; i++) {
+
+        //connect nodes
         int i = 0;
-
-
         for (Node kStart : nodes) {
             connectToAllInView(kStart, rest);
             rest.remove(nodes.length - 1 - i);
             i++;
         }
+
+        //create Adjazenzmatrix
+        movementCosts = new float[nodes.length + 2][nodes.length + 2];
+        for (int j = 0; j < movementCosts.length - 2; j++) {
+            nodes[j].setMatrixIndex(j);
+        }
+        float mc;
+        for (Node n : nodes)
+            for (Node nb : n.getNeighbors())
+                if (movementCosts[n.getMatrixIndex()][nb.getMatrixIndex()] == 0) {
+                    mc = (float) Math.sqrt(Math.pow(n.pos.x - nb.pos.x, 2) + Math.pow(n.pos.y - nb.pos.y, 2));
+                    movementCosts[n.getMatrixIndex()][nb.getMatrixIndex()] = mc;
+                    movementCosts[nb.getMatrixIndex()][n.getMatrixIndex()] = mc;
+                }
+
+
     }
 
     private void connectToAllInView(Node kStart, java.util.List<Node> rest) {
@@ -333,7 +348,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 if (closedList.contains(neighbor))
                     continue;
                 // neuen G-Wert von neighbor von currNode bestimmen
-                float newG = movementCosts[currNode.matrixIndex()][neighbor.matrixIndex()] + currNode.getG();
+                float newG = movementCosts[currNode.getMatrixIndex()][neighbor.getMatrixIndex()] + currNode.getG();
                 // wenn das hier ein besserer Weg ist (oder der erste zu neighbor, wenn man da noch nicht war), dann bei neighbor diesen neuen Weg über currNode speichern
                 if (openList.containsValue(neighbor)) {
                     if (neighbor.getG() < newG)

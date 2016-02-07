@@ -15,6 +15,7 @@ public class Node {
     private float f;
     private ArrayList<Node> neighbors = new ArrayList<>();
     private Node parent;
+    private int matrixIndex;
     public final PointF pos;
     public final Obstacle o;
 
@@ -37,9 +38,13 @@ public class Node {
         k.addNeighbor(this);
     }
 
-    public int matrixIndex() {
+    public int getMatrixIndex() {
         // TODO return index in [Adjazenzmatrix] :P Vorsicht bei startN und endN!!!!
-        return 0;
+        return matrixIndex;
+    }
+
+    public void setMatrixIndex(int index) {
+        matrixIndex = index;
     }
 
     public ArrayList<Node> getNeighbors() {
