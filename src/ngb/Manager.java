@@ -27,6 +27,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private PointF startP = null, endP = null;
 
     private Node[] nodes;
+    private float[][] movementCosts; // TODO indices: startN = length - 2 und endN = length - 1
     private Node startN, endN;
 
     private int startEndCircSize = 10;
@@ -301,9 +302,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     }
 
 
-    private void algorithm() {
-        System.out.println("Starting algorithm..");
-        long time = System.nanoTime();
+    private Node algorithm() {
         // START
         // get connections to new start/end
         startN = new Node(startP, null);
@@ -315,21 +314,44 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
         }
+        // TODO MATRIX ANPASSEN
 
         // a*-Algorithm
         TreeMap<Float, Node> openList = new TreeMap<>();
         HashSet<Node> closedList = new HashSet<>();
 
-        Node currNode = startN;
+        Node currNode = endN;
         while (!openList.isEmpty()) {
-            currNode = openList.firstEntry().getValue();
-            if (currNode == endN) {
-                // target found!!!
+            currNode = openList.remove(openList.firstKey());
+            if (currNode == startN) {
+                // way found :)
+                return startN;
+            }
+            closedList.add(currNode);
 
+            for (Node neighbor : currNode.getNeighbors()) {
+                if (closedList.contains(neighbor))
+                    continue;
+                // neuen G-Wert von neighbor von currNode bestimmen
+                float newG = movementCosts[currNode.matrixIndex()][neighbor.matrixIndex()] + currNode.getG();
+                // wenn das hier ein besserer Weg ist (oder der erste zu neighbor, wenn man da noch nicht war), dann bei neighbor diesen neuen Weg über currNode speichern
+                if (openList.containsValue(neighbor)) {
+                    if (neighbor.getG() < newG)
+                        // zu neighbor gibt es schon einen besseren Weg, also nichts tun
+                        continue;
+                    // neighbor ist schon auf der openList, also mit altem key (=f) rauslöschen!
+                    openList.remove(neighbor.getF());
+                }
+                // neuen F-Wert für neighbor und für diesen Weg bestimmen
+                float newF = newG + currNode.getHeuristic();
+                openList.put(newF, neighbor);
+                neighbor.setF(newF);
+                neighbor.setG(newG);
+                neighbor.setParent(currNode); // noch restliche Zuweisungen
             }
         }
-        // END
-//        System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
+        // no possible way :(
+        return null;
     }
 
     /**

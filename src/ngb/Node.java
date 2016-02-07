@@ -9,7 +9,10 @@ import java.util.ArrayList;
  */
 public class Node {
 
-    private float heuristic, g, f;
+    private float heuristic;
+    private float g;
+
+    private float f;
     private ArrayList<Node> neighbors = new ArrayList<>();
     private Node parent;
     public final PointF pos;
@@ -32,6 +35,11 @@ public class Node {
     public void addNeighborBoth(Node k) {
         neighbors.add(k);
         k.addNeighbor(this);
+    }
+
+    public int matrixIndex() {
+        // TODO return index in [Adjazenzmatrix] :P Vorsicht bei startN und endN!!!!
+        return 0;
     }
 
     public ArrayList<Node> getNeighbors() {
@@ -61,4 +69,13 @@ public class Node {
     public Node getParent() {
         return parent;
     }
+
+    public void setG(float g) {
+        this.g = g;
+    }
+
+    public void setF(float f) {
+        this.f = f;
+    }
+
 }
