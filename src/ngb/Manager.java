@@ -9,7 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.util.*;
 
 import static java.lang.Math.round;
 
@@ -27,7 +27,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private PointF startP = null, endP = null;
 
     private Node[] nodes;
-    private Node startK, endK;
+    private Node startN, endN;
 
     private int startEndCircSize = 10;
 
@@ -284,12 +284,25 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         System.out.println("Starting algorithm..");
         long time = System.nanoTime();
         // START
-
+        // get connections to new start/end
 
         // heuristic, linear
         for (Node k : nodes) {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
+        }
+
+        // a*-Algorithm
+        TreeMap<Float, Node> openList = new TreeMap<>();
+        HashSet<Node> closedList = new HashSet<>();
+
+        Node currNode = startN;
+        while (!openList.isEmpty()) {
+            currNode = openList.firstEntry().getValue();
+            if (currNode == endN) {
+                // target found!!!
+
+            }
         }
         // END
 //        System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
