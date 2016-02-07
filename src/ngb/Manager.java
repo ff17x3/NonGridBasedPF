@@ -44,6 +44,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     public Manager(String mapFile) throws Exception {
         map = Map.readMap(mapFile);
         frame = new DrawFrame(new Dimension(700, 700), this, this, new DimensionF(map.mapWidth, map.mapHeight));
+        frame.addScaleChangeListener(scale -> {
+            for (Obstacle o : map.obstacles) {
+                o.updateScale(scale);
+            }
+        });
 //        clock = new ClockNano(60, this);
 //        clock.startTicking();
     }
