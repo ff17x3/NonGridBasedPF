@@ -36,7 +36,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map3.txt");
+            new Manager("map1.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -254,25 +254,25 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             float endY = kEnd.pos.y - kStart.pos.y;
             if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y)
                     || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y))) {
-                hits = intsHozLine(mRay, oCol.y - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX);
+                hits = intsHozLine(mRay, oCol.y - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX, endY);
                 if (hits)
                     break;
             }
             if (!(kStart.isOn(oCol.x, oCol.y + oCol.height) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
                     || kEnd.isOn(oCol.x, oCol.y + oCol.height) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
-                hits = intsHozLine(mRay, oCol.y + oCol.height - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX);
+                hits = intsHozLine(mRay, oCol.y + oCol.height - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX, endY);
                 if (hits)
                     break;
             }
             if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x, oCol.y + oCol.height)
                     || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x, oCol.y + oCol.height))) {
-                hits = intsVerLine(mRay, oCol.x - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endY);
+                hits = intsVerLine(mRay, oCol.x - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endX, endY);
                 if (hits)
                     break;
             }
             if (!(kStart.isOn(oCol.x + oCol.width, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
                     || kEnd.isOn(oCol.x + oCol.width, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
-                hits = intsVerLine(mRay, oCol.x + oCol.width - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endY);
+                hits = intsVerLine(mRay, oCol.x + oCol.width - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endX, endY);
                 if (hits)
                     break;
             }
@@ -294,24 +294,24 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         return tempAngle;
     }
 
-    private boolean intsHozLine(float angle, float yB, float xB, float widthB, float posEndXRel) {
+    private boolean intsHozLine(float angle, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
         /**horizontal col. detection:
          * A: line: y=m*x
          * B: y = a
          * => x = a/m, wenn x auf der Seite liegt (und Schnittpunkt zwischen den beiden Punkten(Start und End)), dann Kollision
          */
         float sx = intersectPointHoz(getGradientfromAngle(angle), yB);
-        return between(sx, xB, xB + widthB) && between(sx, 0, posEndXRel);
+        return between(sx, xB, xB + widthB) && between(sx, 0, posEndXRel) && between(yB, 0, posEndYRel);
     }
 
-    private boolean intsVerLine(float angle, float xB, float yB, float heightB, float posEndYRel) {
+    private boolean intsVerLine(float angle, float xB, float yB, float heightB, float posEndXRel, float posEndYRel) {
         /**vertical col. detection:
          * A: line: y=m*x
          * B: x = a
          * => y = m*a, wenn y auf der Seite liegt, dann Kollision
          */
         float sy = intersectPointVer(getGradientfromAngle(angle), xB);
-        return between(sy, yB, yB + heightB) && between(sy, 0, posEndYRel);
+        return between(sy, yB, yB + heightB) && between(sy, 0, posEndYRel) && between(xB, 0, posEndXRel);
     }
 
     private boolean between(float a, float x1, float x2) {
