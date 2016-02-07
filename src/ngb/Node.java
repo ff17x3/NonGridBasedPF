@@ -9,8 +9,9 @@ import java.util.ArrayList;
  */
 public class Node {
 
-    private float heuristic;
+    private float heuristic, g, f;
     private ArrayList<Node> neighbors = new ArrayList<>();
+    private Node parent;
     public final PointF pos;
     public final Obstacle o;
 
@@ -43,5 +44,21 @@ public class Node {
 
     public float getHeuristic() {
         return heuristic;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
+    public float getG() {
+        return g;
+    }
+
+    public float getF() {
+        return f;
+    }
+
+    public Node getParent() {
+        return parent;
     }
 }

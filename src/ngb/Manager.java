@@ -106,8 +106,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     private void genNodes() {
         ArrayList<Node> nodeList = new ArrayList<>(map.obstacles.length * 4);
-        int i = 0;
-        Node k1, k2, k3, k4;
+        Node k1 = null, k2 = null, k3 = null, k4 = null;
         for (Obstacle o : map.obstacles) {
             boolean btl = true, btr = true, bbr = true, bbl = true;
             PointF tl = new PointF(o.x, o.y),
@@ -145,13 +144,18 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
 
             //TODO überprüfen, ob Knoten erreichbar sind
-            nodes[i].addNeighborBoth(nodes[i + 1]);
-            nodes[i].addNeighborBoth(nodes[i + 3]);
-
-            nodes[i + 2].addNeighborBoth(nodes[i + 1]);
-            nodes[i + 2].addNeighborBoth(nodes[i + 3]);
-
-            i += 4;
+            if (btl) {
+                if (btr)
+                    k1.addNeighborBoth(k2);
+                if (bbl)
+                    k1.addNeighborBoth(k4);
+            }
+            if (bbr) {
+                if (btr)
+                    k3.addNeighborBoth(k2);
+                if (bbl)
+                    k3.addNeighborBoth(k4);
+            }
         }
     }
 
