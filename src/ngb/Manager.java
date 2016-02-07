@@ -19,6 +19,8 @@ import static java.lang.Math.round;
  */
 public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
+    public static final float MIN_PATH_WIDTH = 0.15f;
+
     private Map map;
     private DrawFrame frame;
     private util.ClockNano clock;
@@ -31,7 +33,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map3.txt");
+            new Manager("map2.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,11 +108,21 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         knots = new Knot[map.obstacles.length * 4];
         int i = 0;
         for (Obstacle o : map.obstacles) {
-            knots[i] = new Knot(new PointF(o.x, o.y), o);
-            knots[i + 1] = new Knot(new PointF(o.x + o.width, o.y), o);
-            knots[i + 2] = new Knot(new PointF(o.x + o.width, o.y + o.height), o);
-            knots[i + 3] = new Knot(new PointF(o.x, o.y + o.height), o);
+            boolean btl = true, btr = true, bbr = true, bbl = true;
+            PointF tl = new PointF(o.x, o.y),
+                    tr = new PointF(o.x + o.width, o.y),
+                    br = new PointF(o.x + o.width, o.y + o.height),
+                    bl = new PointF(o.x, o.y + o.height);
+            for (int j = 0; j < map.obstacles.length; j++) {
+                if (btl && between(tl.x, ))
+            }
+            knots[i] = new Knot(tl, o);
+            knots[i + 1] = new Knot(tr, o);
+            knots[i + 2] = new Knot(br, o);
+            knots[i + 3] = new Knot(bl, o);
 
+
+            //TODO überprüfen, ob Knoten erreichbar sind
             knots[i].addNeighborBoth(knots[i + 1]);
             knots[i].addNeighborBoth(knots[i + 3]);
 
@@ -191,13 +203,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         return tempAngle;
     }
 
-    private boolean rayHitsObstacle(float mRay, Obstacle o, PointF posStart, PointF posEnd) {
-        //Ursprung ist x,y
-        return intsHozLine(mRay, o.y - posStart.y, o.x - posStart.x, o.width, posEnd.x - posStart.x)
-                || intsHozLine(mRay, o.y + o.height - posStart.y, o.x - posStart.x, o.width, posEnd.x - posStart.x)
-                || intsVerLine(mRay, o.x - posStart.x, o.y - posStart.y, o.height, posEnd.y - posStart.y)
-                || intsVerLine(mRay, o.x + o.width - posStart.x, o.y - posStart.y, o.height, posEnd.y - posStart.y);
-    }
 
     private boolean intsHozLine(float angle, float yB, float xB, float widthB, float posEndXRel) {
         /**horizontal col. detection:
