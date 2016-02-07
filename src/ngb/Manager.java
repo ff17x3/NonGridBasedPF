@@ -345,6 +345,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         float mc;
         int startIndex = movementCosts.length - 2;
         int endIndex = movementCosts.length - 1;
+        startN.setMatrixIndex(startIndex);
+        endN.setMatrixIndex(endIndex);
         for (Node nb : startN.getNeighbors()) {
             mc = (float) Math.sqrt(Math.pow(startP.x - nb.pos.x, 2) + Math.pow(startP.y - nb.pos.y, 2));
             movementCosts[startIndex][nb.getMatrixIndex()] = mc;
@@ -358,7 +360,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
         // heuristic, linear
         for (Node k : nodes) {
-            float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
+            float dX = k.pos.x - startP.x, dY = k.pos.y - startP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
             System.out.println("bl");
         }
