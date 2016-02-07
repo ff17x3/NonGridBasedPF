@@ -95,7 +95,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
-                System.out.println("keyEvent: '" + e.getKeyChar() + "'");
+                System.out.println("KeyChar: '" + e.getKeyChar() + "'" + " keyCode:" + e.getKeyCode());
                 switch (e.getKeyChar()) {
                     case ' ':
                         if (startP != null && endP != null) {
