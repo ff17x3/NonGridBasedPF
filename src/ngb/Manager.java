@@ -336,6 +336,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         endN = new Node(endP, null);
         connectToAllInView(startN, nodes);
         connectToAllInView(endN, nodes);
+        testInView(startN, null, endN);
         float mc;
         int startIndex = movementCosts.length - 2;
         int endIndex = movementCosts.length - 1;
@@ -355,7 +356,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
         }
-        // TODO MATRIX ANPASSEN
 
         // a*-Algorithm
         TreeMap<Float, Node> openList = new TreeMap<>();
