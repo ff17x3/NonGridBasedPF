@@ -29,7 +29,12 @@ public class Obstacle {
 
     public void draw(Graphics g, float scale) {
         g.setColor(Color.BLACK);
-        g.fillRect(Math.round(x * scale), Math.round(y * scale), Math.round(width * scale), Math.round(height * scale));
+        int xRound = Math.round(x * scale);
+        int yRound = Math.round(y * scale);
+        //                       actSize Right Coor| drawed left Coor
+        int wRound = Math.round((x + width) * scale) - xRound;
+        int hRound = Math.round((y + height) * scale) - yRound;
+        g.fillRect(xRound, yRound, wRound, hRound);
 
     }
 

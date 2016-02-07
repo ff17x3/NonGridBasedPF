@@ -61,6 +61,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
         if (nodes != null)
             for (Node k : nodes) {
+                g.fillOval(round(k.pos.x * scale) - startEndCircSize / 2, round(k.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
                 ArrayList<Node> nb = k.getNeighbors();
                 for (Node kNeighbor : nb)
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
@@ -117,11 +118,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 Obstacle oTest = map.obstacles[j];
                 if (btl && (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)))
                     btl = false;
-                if (btr && (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tl, oTest.x, oTest.y, oTest.height)))
+                if (btr && (isNearHorz(tr, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tr, oTest.x, oTest.y, oTest.height)))
                     btr = false;
-                if (bbr && (isNearHorz(tl, oTest.y, oTest.x, oTest.width) || isNearVert(tl, oTest.x, oTest.y, oTest.height)))
+                if (bbr && (isNearHorz(br, oTest.y, oTest.x, oTest.width) || isNearVert(br, oTest.x, oTest.y, oTest.height)))
                     bbr = false;
-                if (bbl && (isNearHorz(tl, oTest.y, oTest.x, oTest.width) || isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)))
+                if (bbl && (isNearHorz(bl, oTest.y, oTest.x, oTest.width) || isNearVert(bl, oTest.x + oTest.width, oTest.y, oTest.height)))
                     bbl = false;
 
             }
@@ -157,6 +158,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     k3.addNeighborBoth(k4);
             }
         }
+        System.out.println("nodeList.size() = " + nodeList.size());
+        nodes = nodeList.toArray(new Node[nodeList.size()]);
     }
 
     private boolean isNearHorz(PointF p, float yLine, float xStart, float width) {
@@ -175,56 +178,70 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             rest.add(nodes[i]);
 //        for (int i = 0; i < map.obstacles.length; i++) {
         int i = 0;
-        float dx, dy;
-        boolean hits = false;
+
+
         for (Node kStart : nodes) {
-            Obstacle oStart = kStart.o;
-            for (Node kEnd : rest) {
-                Obstacle oEnd = kEnd.o;
-                if (oStart == oEnd)
-                    continue;
-                for (Obstacle oCol : map.obstacles) {
-
-                    dx = kEnd.pos.x - kStart.pos.x;
-                    dy = kEnd.pos.y - kStart.pos.y;
-//                    if (rayHitsObstacle(getAngle(dx, dy), oCol, kStart.pos, kEnd.pos)) {
-                    float mRay = getAngle(dx, dy);
-                    float endX = kEnd.pos.x - kStart.pos.x;
-                    float endY = kEnd.pos.y - kStart.pos.y;
-                    if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y)
-                            || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y))) {
-                        hits = intsHozLine(mRay, oCol.y - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX);
-                        if (hits)
-                            break;
-                    }
-                    if (!(kStart.isOn(oCol.x, oCol.y + oCol.height) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                            || kEnd.isOn(oCol.x, oCol.y + oCol.height) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
-                        hits = intsHozLine(mRay, oCol.y + oCol.height - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX);
-                        if (hits)
-                            break;
-                    }
-                    if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x, oCol.y + oCol.height)
-                            || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x, oCol.y + oCol.height))) {
-                        hits = intsVerLine(mRay, oCol.x - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endY);
-                        if (hits)
-                            break;
-                    }
-                    if (!(kStart.isOn(oCol.x + oCol.width, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                            || kEnd.isOn(oCol.x + oCol.width, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
-                        hits = intsVerLine(mRay, oCol.x + oCol.width - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endY);
-                        if (hits)
-                            break;
-                    }
-
-                }
-                if (!hits) {
-                    kStart.addNeighborBoth(kEnd);
-                } else
-                    hits = false;
-            }
-            //(map.obstacles.length - 1 - i) should be the index of kStart
+            connectToAllInView(kStart, rest);
             rest.remove(nodes.length - 1 - i);
             i++;
+        }
+    }
+
+    private void connectToAllInView(Node kStart, java.util.List<Node> rest) {
+        Obstacle oStart = kStart.o;
+        for (Node kEnd : rest) {
+            testInView(kEnd, oStart, kStart);
+        }
+    }
+
+    private void connectToAllInView(Node kStart, Node[] rest) {
+        for (Node kEnd : rest) {
+            testInView(kEnd, null, kStart);
+        }
+    }
+
+    private void testInView(Node kEnd, Obstacle oStart, Node kStart) {
+        float dx, dy;
+        boolean hits = false;
+        Obstacle oEnd = kEnd.o;
+        if (oStart == oEnd)
+            return;
+        for (Obstacle oCol : map.obstacles) {
+
+            dx = kEnd.pos.x - kStart.pos.x;
+            dy = kEnd.pos.y - kStart.pos.y;
+//                    if (rayHitsObstacle(getAngle(dx, dy), oCol, kStart.pos, kEnd.pos)) {
+            float mRay = getAngle(dx, dy);
+            float endX = kEnd.pos.x - kStart.pos.x;
+            float endY = kEnd.pos.y - kStart.pos.y;
+            if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y)
+                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y))) {
+                hits = intsHozLine(mRay, oCol.y - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX);
+                if (hits)
+                    break;
+            }
+            if (!(kStart.isOn(oCol.x, oCol.y + oCol.height) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
+                    || kEnd.isOn(oCol.x, oCol.y + oCol.height) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
+                hits = intsHozLine(mRay, oCol.y + oCol.height - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX);
+                if (hits)
+                    break;
+            }
+            if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x, oCol.y + oCol.height)
+                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x, oCol.y + oCol.height))) {
+                hits = intsVerLine(mRay, oCol.x - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endY);
+                if (hits)
+                    break;
+            }
+            if (!(kStart.isOn(oCol.x + oCol.width, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
+                    || kEnd.isOn(oCol.x + oCol.width, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
+                hits = intsVerLine(mRay, oCol.x + oCol.width - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endY);
+                if (hits)
+                    break;
+            }
+
+        }
+        if (!hits) {
+            kStart.addNeighborBoth(kEnd);
         }
     }
 
@@ -238,7 +255,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             tempAngle = (float) (Math.atan(m));
         return tempAngle;
     }
-
 
     private boolean intsHozLine(float angle, float yB, float xB, float widthB, float posEndXRel) {
         /**horizontal col. detection:
@@ -285,7 +301,10 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         long time = System.nanoTime();
         // START
         // get connections to new start/end
-
+        startN = new Node(startP, null);
+        endN = new Node(endP, null);
+        connectToAllInView(startN, nodes);
+        connectToAllInView(endN, nodes);
         // heuristic, linear
         for (Node k : nodes) {
             float dX = k.pos.x - endP.x, dY = k.pos.y - endP.y;
