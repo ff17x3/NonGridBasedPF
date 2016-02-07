@@ -242,7 +242,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         float dx, dy;
         boolean hits = false;
         Obstacle oEnd = kEnd.o;
-        if (oStart == oEnd)
+        if (oStart == oEnd && oStart != null)
             return;
         for (Obstacle oCol : map.obstacles) {
 
