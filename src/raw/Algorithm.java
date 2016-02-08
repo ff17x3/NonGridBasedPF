@@ -5,6 +5,8 @@ import simulation.Obstacle;//TODO
 import util.PointF;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeMap;
 
 import static raw.Node.*;
 
@@ -16,7 +18,90 @@ public class Algorithm {
     public static Node getWay(MatrixPosBundle map) {
 
         // generate Node structure from Bundle
-        float[][] matrix = map.
+        float[][] matrix = map.matrix;
+        PointF[] positions = map.nodesPos;
+        byte[] expandDirs = map.expandDir;
+
+        int startI = positions.length - 2, endI = positions.length - 1;
+
+        // create Node Objects
+        Node[] nodes = new Node[positions.length - 2];
+        Node startN = new Node(positions[startI], (byte) -1, startI);
+        Node endN = new Node(positions[endI], (byte) -1, endI);
+        for (int i = 0; i < nodes.length; i++) {
+            nodes[i] = new Node(positions[i], expandDirs[i], i);
+        }
+        // connect Node Objects
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i + 1; j < matrix[i].length; j++) {
+                if (matrix[i][j] != 0) {
+                    if (i < nodes.length && j < nodes.length) {
+                        nodes[i].addNeighbor(nodes[j]);
+                        nodes[j].addNeighbor(nodes[i]);
+                    } else { // entweder startN oder endN
+                        if (i == startI) { // es ist startN
+                            if (j < nodes.length) { // zu irgendeinem Node
+                                startN.addNeighbor(nodes[j]);
+                                nodes[j].addNeighbor(startN);
+                            } else { // zu endI
+                                startN.addNeighbor(endN);
+                                endN.addNeighbor(startN);
+                            }
+                        } else if (i == endI) {
+                            if (j < nodes.length) {// zu irgendeinem Node
+                                endN.addNeighbor(nodes[j]);
+                                nodes[j].addNeighbor(endN);
+                            } else { // zu startI
+                                endN.addNeighbor(startN);
+                                startN.addNeighbor(endN);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // leg los
+        // heuristic, linear
+        for (Node k : nodes) {
+            float dX = k.pos.x - startN.pos.x, dY = k.pos.y - startN.pos.y;
+            k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
+        }
+        // a*-Algorithm
+        TreeMap<Float, Node> openList = new TreeMap<>();
+        HashSet<Node> closedList = new HashSet<>();
+        Node currNode;
+        openList.put(0f, endN);
+        while (!openList.isEmpty()) {
+            currNode = openList.remove(openList.firstKey());
+            if (currNode == startN) {
+                // way found :)
+                return startN;
+            }
+            closedList.add(currNode);
+
+            for (Node neighbor : currNode.getNeighbors()) {
+                if (closedList.contains(neighbor))
+                    continue;
+                // neuen G-Wert von neighbor von currNode bestimmen
+                float newG = matrix[currNode.getMatrixIndex()][neighbor.getMatrixIndex()] + currNode.getG();
+                // wenn das hier ein besserer Weg ist (oder der erste zu neighbor, wenn man da noch nicht war), dann bei neighbor diesen neuen Weg über currNode speichern
+                if (openList.containsValue(neighbor)) {
+                    if (neighbor.getG() < newG)
+                        // zu neighbor gibt es schon einen besseren Weg, also nichts tun
+                        continue;
+                    // neighbor ist schon auf der openList, also mit altem key (=f) rauslöschen!
+                    openList.remove(neighbor.getF());
+                }
+                // neuen F-Wert für neighbor und für diesen Weg bestimmen
+                float newF = newG + neighbor.getHeuristic();
+                openList.put(newF, neighbor);
+                neighbor.setF(newF);
+                neighbor.setG(newG);
+                neighbor.setParent(currNode); // noch restliche Zuweisungen
+            }
+        }
+        // no possible way :(
+        return null;
     }
 
 
