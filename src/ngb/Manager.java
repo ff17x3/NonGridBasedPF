@@ -149,14 +149,18 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 switch (e.getKeyChar()) {
                     case ' ':
                         if (startP != null && endP != null) {
-                            System.out.println("Starting algorithm..");
-                            long time = System.nanoTime();
-                            genNodes();
-                            finishMatrix();
-                            wayAnchor = algorithm();
-                            System.out.println("is wayAnchor null? " + (wayAnchor == null));
-                            System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
-                            dp.repaint();
+                            new Thread() {
+                                public void run() {
+                                    System.out.println("Starting algorithm..");
+                                    long time = System.nanoTime();
+                                    genNodes();
+                                    finishMatrix();
+                                    wayAnchor = algorithm();
+                                    System.out.println("is wayAnchor null? " + (wayAnchor == null));
+                                    System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
+                                    dp.repaint();
+                                }
+                            }.start();
                         }
                         break;
                     case 'p':
@@ -446,7 +450,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 frame.redraw();
                 synchronized (this) {
                     try {
+                        System.out.println("wait now");
                         wait();
+                        System.out.println("notified");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
