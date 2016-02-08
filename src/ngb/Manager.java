@@ -366,6 +366,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             float dX = k.pos.x - startP.x, dY = k.pos.y - startP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
         }
+        printHeuristic();
         // a*-Algorithm
         TreeMap<Float, Node> openList = new TreeMap<>();
         HashSet<Node> closedList = new HashSet<>();
@@ -405,7 +406,20 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         return null;
     }
 
+    private void printHeuristic() {
+        System.out.println("Heuristic: ");
+        for (int i = 0; i < nodes.length; i++) {
+            System.out.print(to2Digit(i) + " | ");
+        }
+        System.out.println();
+        for (Node n : nodes) {
+            System.out.print(to2Digit(n.getHeuristic()) + " | ");
+        }
+    }
+
     private void printMatrix() {
+        System.out.println("Matrix: ");
+
         System.out.print("      ");
         for (int i = 0; i < movementCosts.length; i++) {
             System.out.print(to2Digit(i) + " | ");
