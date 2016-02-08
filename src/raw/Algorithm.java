@@ -6,6 +6,8 @@ import util.PointF;
 
 import java.util.ArrayList;
 
+import static raw.Node.*;
+
 /**
  * Created by Max!!! on 08.02.2016.
  */
@@ -27,6 +29,11 @@ public class Algorithm {
 
     private void genNodes(Obstacle[] obstacles) {
         ArrayList<PointF> coordsList = new ArrayList<>(obstacles.length * 4);
+        ArrayList<Byte> expDirList = new ArrayList<>(obstacles.length * 4);
+        ArrayList<Obstacle> obs = new ArrayList<>(obstacles.length * 4);
+        float[][] miniMatrix = new float[obstacles.length * 4][obstacles.length * 4];
+
+        // create Node strucur in Arrays
         Node k1 = null, k2 = null, k3 = null, k4 = null;
         boolean btl = true, btr = true, bbr = true, bbl = true;
         for (Obstacle o : obstacles) {
@@ -83,6 +90,8 @@ public class Algorithm {
             o.setBr(bbr);
             o.setBl(bbl);
         }
+        int iTl = -1, iTr = -1, iBl = -1, iBr = -1;
+        float cache = 0;
         for (Obstacle o : obstacles) {
             btl = o.isTl();
             btr = o.isTr();
@@ -96,37 +105,79 @@ public class Algorithm {
                     bl = new PointF(o.x, o.y + o.height);
 
             if (btl) {
-                k1 = new Node(tl, o);
-                coordsList.add(k1);
+                iTl = coordsList.size();
+                coordsList.add(tl);
+                expDirList.add(UP_LEFT);
+                obs.add(o);
             }
             if (btr) {
-                k2 = new Node(tr, o);
-                coordsList.add(k2);
+                iTr = coordsList.size();
+                coordsList.add(tr);
+                expDirList.add(UP_RIGHT);
+                obs.add(o);
             }
             if (bbr) {
-                k3 = new Node(br, o);
-                coordsList.add(k3);
+                iBr = coordsList.size();
+                coordsList.add(br);
+                expDirList.add(DOWN_RIGHT);
+                obs.add(o);
             }
             if (bbl) {
-                k4 = new Node(bl, o);
-                coordsList.add(k4);
+                iBl = coordsList.size();
+                coordsList.add(bl);
+                expDirList.add(DOWN_LEFT);
+                obs.add(o);
             }
 
+
             if (btl) {
-                if (btr && o.isT())
-                    k1.addNeighborBoth(k2);
-                if (bbl && o.isL())
-                    k1.addNeighborBoth(k4);
+                if (btr && o.isT()) {
+                    cache = calcMoveCost(coordsList.get(iTr), coordsList.get(iTl));
+                    miniMatrix[iTr][iTl] = cache;
+                    miniMatrix[iTl][iTr] = cache;
+                }
+                if (bbl && o.isL()) {
+                    cache = calcMoveCost(coordsList.get(iBl), coordsList.get(iTl));
+                    miniMatrix[iBl][iTl] = cache;
+                    miniMatrix[iTl][iBl] = cache;
+                }
             }
             if (bbr) {
-                if (btr && o.isR())
-                    k3.addNeighborBoth(k2);
-                if (bbl && o.isB())
-                    k3.addNeighborBoth(k4);
+                if (btr && o.isR()) {
+                    cache = calcMoveCost(coordsList.get(iBr), coordsList.get(iTr));
+                    miniMatrix[iBr][iTr] = cache;
+                    miniMatrix[iTr][iBr] = cache;
+                }
+                if (bbl && o.isB()) {
+                    cache = calcMoveCost(coordsList.get(iBr), coordsList.get(iBl));
+                    miniMatrix[iBr][iBl] = cache;
+                    miniMatrix[iBl][iBr] = cache;
+                }
+            }
+
+        }
+
+        System.out.println("nodeList.size() = " + coordsList.size());
+        PointF[] points = coordsList.toArray(new PointF[coordsList.size() + 2]);
+        Byte[] dirs = expDirList.toArray(new Byte[expDirList.size()]);
+        float[][] matrix = new float[points.length][points.length];
+
+        for (int j = 0; j < miniMatrix.length; j++) {
+            for (int k = 0; k < miniMatrix[0].length; k++) {
+                matrix[j][k] = miniMatrix[j][k];
             }
         }
-        System.out.println("nodeList.size() = " + coordsList.size());
-        nodes = coordsList.toArray(new Node[coordsList.size()]);
+
+
+        //finish matrix (add connetion to matrix)---------------------------------------------
+
+
+        for (int i = 0; i < points.length; i++) {
+            for (int j = 0; j < points.length; j++) {
+                testInView(points, obs, j, i, obstacles, matrix);
+            }
+        }
+
     }
 
     private boolean isNearHorz(PointF p, float yLine, float xStart, float width) {
@@ -139,99 +190,76 @@ public class Algorithm {
                 && between(p.y, yStart - MIN_PATH_WIDTH, yStart + height + MIN_PATH_WIDTH));
     }
 
-    private void finishMatrix() {
-        java.util.List<Node> rest = new ArrayList<>(nodes.length);
-        for (int i = nodes.length - 1; i >= 0; i--)
-            rest.add(nodes[i]);
-
-        //connect nodes
-        int i = 0;
-        for (Node kStart : nodes) {
-            connectToAllInView(kStart, rest);
-            rest.remove(nodes.length - 1 - i);
-            i++;
-        }
-
-        //create Adjazenzmatrix
-        movementCosts = new float[nodes.length + 2][nodes.length + 2];
-        for (int j = 0; j < movementCosts.length - 2; j++) {
-            nodes[j].setMatrixIndex(j);
-        }
-        float mc;
-        for (Node n : nodes)
-            for (Node nb : n.getNeighbors())
-                if (movementCosts[n.getMatrixIndex()][nb.getMatrixIndex()] == 0) {
-                    mc = (float) Math.sqrt(Math.pow(n.pos.x - nb.pos.x, 2) + Math.pow(n.pos.y - nb.pos.y, 2));
-                    movementCosts[n.getMatrixIndex()][nb.getMatrixIndex()] = mc;
-                    movementCosts[nb.getMatrixIndex()][n.getMatrixIndex()] = mc;
-                }
+    private float calcMoveCost(PointF a, PointF b) {
+        return (float) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
-    private void connectToAllInView(Node kStart, java.util.List<Node> rest) {
-        Obstacle oStart = kStart.o;
-        for (Node kEnd : rest) {
-            testInView(kEnd, oStart, kStart);
-        }
-    }
+//    private void connectToAllInView(Node kStart, Node[] rest) {
+//        for (Node kEnd : rest) {
+//            testInView(kEnd, null, kStart);
+//        }
+//    }
 
-    private void connectToAllInView(Node kStart, Node[] rest) {
-        for (Node kEnd : rest) {
-            testInView(kEnd, null, kStart);
-        }
-    }
-
-    private void testInView(Node kEnd, Obstacle oStart, Node kStart) {
+    private void testInView(PointF[] points, ArrayList<Obstacle> obs, int indexEnd, int indexStart, Obstacle[] obstacles, float[][] matrix) {
         float dx, dy;
         boolean hits = false;
-        Obstacle oEnd = kEnd.o;
-        if (oStart == oEnd && oStart != null)
+        PointF pStart = points[indexStart];
+        PointF pEnd = points[indexEnd];
+        Obstacle oEnd = obs.get(indexEnd);
+        Obstacle oStart = obs.get(indexStart);
+        if (indexStart == indexEnd && oStart != null)
             return;
         for (Obstacle oCol : obstacles) {
 
-            if (kEnd.pos.x == 1 && kEnd.pos.y == 6 && kStart.pos.x == 1 && kStart.pos.y == 1 && oCol.width == 3)
+            if (pEnd.x == 1 && pEnd.y == 6 && pEnd.x == 1 && pEnd.y == 1 && oCol.width == 3)
                 System.out.println("bgb");
 
-            dx = kEnd.pos.x - kStart.pos.x;
-            dy = kEnd.pos.y - kStart.pos.y;
-//                    if (rayHitsObstacle(getAngle(dx, dy), oCol, kStart.pos, kEnd.pos)) {
+            dx = pEnd.x - pEnd.x;
+            dy = pEnd.y - pEnd.y;
+//                    if (rayHitsObstacle(getAngle(dx, dy), oCol, pEnd, pEnd)) {
             float mRay = dy / dx;
-            float endX = kEnd.pos.x - kStart.pos.x;
-            float endY = kEnd.pos.y - kStart.pos.y;
-            if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y)
-                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y)
-                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.x == kStart.pos.x)))) {
-                hits = intsHozLine(mRay, oCol.y - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX, endY);
+            float endX = pEnd.x - pEnd.x;
+            float endY = pEnd.y - pEnd.y;
+            if (!(pStart.equals(oCol) || isOn(pStart, oCol.x + oCol.width, oCol.y)
+                    || pEnd.equals(oCol) || pEnd.isOn(oCol.x + oCol.width, oCol.y)
+                    || ((oCol == oStart || oCol == oEnd) && (pEnd.x == pEnd.x)))) {
+                hits = intsHozLine(mRay, oCol.y - pEnd.y, oCol.x - pEnd.x, oCol.width, endX, endY);
                 if (hits)
                     break;
             }
-            if (!(kStart.isOn(oCol.x, oCol.y + oCol.height) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                    || kEnd.isOn(oCol.x, oCol.y + oCol.height) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.x == kStart.pos.x)))) {
-                hits = intsHozLine(mRay, oCol.y + oCol.height - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX, endY);
+            if (!(isOn(pStart, oCol.x, oCol.y + oCol.height) || isOn(pStart, oCol.x + oCol.width, oCol.y + oCol.height)
+                    || isOn(pEnd, oCol.x, oCol.y + oCol.height) || isOn(pEnd, oCol.x + oCol.width, oCol.y + oCol.height)
+                    || ((oCol == oStart || oCol == oEnd) && (pEnd.x == pEnd.x)))) {
+                hits = intsHozLine(mRay, oCol.y + oCol.height - pEnd.y, oCol.x - pEnd.x, oCol.width, endX, endY);
                 if (hits)
                     break;
             }
-            if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x, oCol.y + oCol.height)
-                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x, oCol.y + oCol.height)
-                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.y == kStart.pos.y)))) {
-                hits = intsVerLine(mRay, oCol.x - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endX, endY);
+            if (!(pStart.equals(oCol) || isOn(pStart, oCol.x, oCol.y + oCol.height)
+                    || pEnd.equals(oCol) || isOn(pEnd, oCol.x, oCol.y + oCol.height)
+                    || ((oCol == oStart || oCol == oEnd) && (pEnd.y == pEnd.y)))) {
+                hits = intsVerLine(mRay, oCol.x - pEnd.x, oCol.y - pEnd.y, oCol.height, endX, endY);
                 if (hits)
                     break;
             }
-            if (!(kStart.isOn(oCol.x + oCol.width, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                    || kEnd.isOn(oCol.x + oCol.width, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.y == kStart.pos.y)))) {
-                hits = intsVerLine(mRay, oCol.x + oCol.width - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endX, endY);
+            if (!(isOn(pStart, oCol.x + oCol.width, oCol.y) || isOn(pStart, oCol.x + oCol.width, oCol.y + oCol.height)
+                    || isOn(pEnd, oCol.x + oCol.width, oCol.y) || isOn(pEnd, oCol.x + oCol.width, oCol.y + oCol.height)
+                    || ((oCol == oStart || oCol == oEnd) && (pEnd.y == pEnd.y)))) {
+                hits = intsVerLine(mRay, oCol.x + oCol.width - pEnd.x, oCol.y - pEnd.y, oCol.height, endX, endY);
                 if (hits)
                     break;
             }
 
         }
         if (!hits) {
-            kStart.addNeighborBoth(kEnd);
+            float cache = calcMoveCost(pStart, pEnd);
+            matrix[indexEnd][indexStart] = cache;
+            matrix[indexStart][indexEnd] = cache;
         }
     }
 
+    private boolean isOn(PointF p, float x, float y) {
+        return p.x == x && p.y == y;
+    }
 
     private boolean intsHozLine(float m, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
         /**horizontal col. detection:
