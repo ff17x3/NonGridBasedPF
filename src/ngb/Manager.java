@@ -246,10 +246,13 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             return;
         for (Obstacle oCol : map.obstacles) {
 
+            if (kEnd.pos.x == 1 && kEnd.pos.y == 6 && kStart.pos.x == 1 && kStart.pos.y == 1 && oCol.width == 3)
+                System.out.println("bgb");
+
             dx = kEnd.pos.x - kStart.pos.x;
             dy = kEnd.pos.y - kStart.pos.y;
 //                    if (rayHitsObstacle(getAngle(dx, dy), oCol, kStart.pos, kEnd.pos)) {
-            float mRay = getAngle(dx, dy);
+            float mRay = dy / dx;
             float endX = kEnd.pos.x - kStart.pos.x;
             float endY = kEnd.pos.y - kStart.pos.y;
             if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y)
@@ -294,23 +297,23 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         return tempAngle;
     }
 
-    private boolean intsHozLine(float angle, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
+    private boolean intsHozLine(float m, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
         /**horizontal col. detection:
          * A: line: y=m*x
          * B: y = a
          * => x = a/m, wenn x auf der Seite liegt (und Schnittpunkt zwischen den beiden Punkten(Start und End)), dann Kollision
          */
-        float sx = intersectPointHoz(getGradientfromAngle(angle), yB);
+        float sx = intersectPointHoz(m, yB);
         return between(sx, xB, xB + widthB) && between(sx, 0, posEndXRel) && between(yB, 0, posEndYRel);
     }
 
-    private boolean intsVerLine(float angle, float xB, float yB, float heightB, float posEndXRel, float posEndYRel) {
+    private boolean intsVerLine(float m, float xB, float yB, float heightB, float posEndXRel, float posEndYRel) {
         /**vertical col. detection:
          * A: line: y=m*x
          * B: x = a
          * => y = m*a, wenn y auf der Seite liegt, dann Kollision
          */
-        float sy = intersectPointVer(getGradientfromAngle(angle), xB);
+        float sy = intersectPointVer(m, xB);
         return between(sy, yB, yB + heightB) && between(sy, 0, posEndYRel) && between(xB, 0, posEndXRel);
     }
 
