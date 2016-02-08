@@ -35,6 +35,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private TreeMap<Float, Node> openList = null;
     private HashSet<Node> closedList = null;
     private Node currNode;
+    private boolean drawInfo = false, drawString = false, stepforstep = false, algFinished = false;
+    private String help = "---HELP---\nclick for start-/endpoint\nspace: start algorithm\ns: toggle draw string\ni: toggle draw info\nt: toggle step-for-step and path only\np: one step in step-for-step\n---\n";
 
     private int circSize = 10;
 
@@ -56,6 +58,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 o.updateScale(scale);
             }
         });
+        System.out.println(help);
 //        clock = new ClockNano(60, this);
 //        clock.startTicking();
     }
@@ -101,7 +104,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             }
         }
         // draw way
-        if (wayAnchor != null) {
+        if (algFinished && wayAnchor != null) {
             g.setColor(C_PATH);
             Node l = null;
             for (Node n = wayAnchor; n != null; n = n.getParent()) {
@@ -112,18 +115,19 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             }
         }
         // draw node values, list member markers, etc
-        if (allNodes != null) {
+        if (allNodes != null && drawInfo && stepforstep) {
             for (Node k : allNodes) {
                 if (k == null)
                     continue;
                 // draw info String
-                g.setColor(C_FONT);
-                String info1 = k.getMatrixIndex() + ",G: " + to2Digit(k.getG() * 10);
-                String info2 = "H:" + to2Digit(k.getHeuristic() * 10) + ", F:" + to2Digit(k.getF() * 10);
-                g.setFont(new Font("Calibri", Font.PLAIN, 11));
-                g.drawString(info1, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
-                g.drawString(info2, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2 + 12);
-
+                if (drawString) {
+                    g.setColor(C_FONT);
+                    String info1 = k.getMatrixIndex() + ",G: " + to2Digit(k.getG() * 10);
+                    String info2 = "H:" + to2Digit(k.getHeuristic() * 10) + ", F:" + to2Digit(k.getF() * 10);
+                    g.setFont(new Font("Calibri", Font.PLAIN, 11));
+                    g.drawString(info1, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+                    g.drawString(info2, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2 + 12);
+                }
                 if (k == currNode) { // is current node
                     g.setColor(C_CURRELEM);
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale) - circSize / 2, round(k.pos.x * scale), round(k.pos.y * scale) + circSize / 2);
@@ -149,6 +153,13 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 super.mouseClicked(e);
                 float scale = frame.getScale();
                 System.out.println("clicked " + e.getX() + ", " + e.getY() + " (scale = " + scale + ")");
+                if (algFinished) {
+                    algFinished = false;
+                    startP = null;
+                    endP = null;
+                    allNodes = null;
+                    frame.redraw();
+                }
                 if (startP == null || (startP != null && endP != null)) {
                     startP = new PointF(e.getX() / scale, e.getY() / scale);
                     endP = null;
@@ -174,6 +185,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                                     wayAnchor = algorithm();
                                     System.out.println("is wayAnchor null? " + (wayAnchor == null));
                                     System.out.println("Algorithm finished, required time: " + (System.nanoTime() - time) * 1e-6 + "ms");
+                                    algFinished = true;
                                     dp.repaint();
                                 }
                             }.start();
@@ -184,6 +196,20 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                             Manager.this.notify();
                         }
                         break;
+                    case 'i':
+                        drawInfo = !drawInfo;
+                        System.out.println("drawInfo = " + drawInfo);
+                        break;
+                    case 's':
+                        drawString = !drawString;
+                        System.out.println("drawString = " + drawString);
+                        break;
+                    case 't':
+                        stepforstep = !stepforstep;
+                        System.out.println("stepforstep = " + stepforstep);
+                        break;
+                    default:
+                        System.out.println(help);
                 }
             }
         });
@@ -389,12 +415,14 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         // get connections to new start/end
         startN = new Node(startP, null);
         endN = new Node(endP, null);
+        // TODO wenn nicht zeichnen, dann das hier weglassen!
         allNodes = new Node[nodes.length + 2];
         for (int i = 0; i < nodes.length; i++) {
             allNodes[i] = nodes[i];
         }
         allNodes[nodes.length] = startN;
         allNodes[nodes.length + 1] = endN;
+        //##############
         connectToAllInView(startN, nodes);
         connectToAllInView(endN, nodes);
         testInView(startN, null, endN);
@@ -453,14 +481,17 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 neighbor.setG(newG);
                 neighbor.setParent(currNode); // noch restliche Zuweisungen
 
+                // TODO wenn nicht zeichnen, weg damit
                 frame.redraw();
-                synchronized (this) {
-                    try {
+                if (stepforstep) {
+                    synchronized (this) {
+                        try {
 //                        System.out.println("wait now");
-                        wait();
+                            wait();
 //                        System.out.println("notified");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
