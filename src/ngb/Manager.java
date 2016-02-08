@@ -61,8 +61,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     }
 
     @Override
-    public void draw(Graphics g, float scale) {
+    public void draw(Graphics gp, float scale) {
         // draw obstacles
+        Graphics2D g = (Graphics2D) gp;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         g.setColor(new Color(0x4F4F4F));
         g.fillRect(0, 0, round(map.mapWidth * scale), round(map.mapHeight * scale));
         for (Obstacle o : map.obstacles) {
@@ -115,8 +118,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     continue;
                 // draw info String
                 g.setColor(C_FONT);
-                String info = String.valueOf(k.getMatrixIndex());
-                g.drawString(info, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+                String info1 = k.getMatrixIndex() + ",G: " + to2Digit(k.getG() * 10);
+                String info2 = "H:" + to2Digit(k.getHeuristic() * 10) + ", F:" + to2Digit(k.getF() * 10);
+                g.setFont(new Font("Calibri", Font.PLAIN, 11));
+                g.drawString(info1, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+                g.drawString(info2, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2 + 12);
 
                 if (k == currNode) { // is current node
                     g.setColor(C_CURRELEM);
