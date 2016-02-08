@@ -306,7 +306,7 @@ public class Algorithm {
             float endX = pEnd.x - pEnd.x;
             float endY = pEnd.y - pEnd.y;
             if (!(pStart.equals(oCol) || isOn(pStart, oCol.x + oCol.width, oCol.y)
-                    || pEnd.equals(oCol) || pEnd.isOn(oCol.x + oCol.width, oCol.y)
+                    || pEnd.equals(oCol) || isOn(pEnd, oCol.x + oCol.width, oCol.y)
                     || ((oCol == oStart || oCol == oEnd) && (pEnd.x == pEnd.x)))) {
                 hits = intsHozLine(mRay, oCol.y - pEnd.y, oCol.x - pEnd.x, oCol.width, endX, endY);
                 if (hits)
