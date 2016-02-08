@@ -42,7 +42,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map4.txt");
+            new Manager("map5.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,6 +226,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     bl = new PointF(o.x, o.y + o.height);
             for (int j = 0; j < map.obstacles.length; j++) {
                 Obstacle oTest = map.obstacles[j];
+                if (o == oTest)
+                    continue;
                 if (btl && (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)))
                     btl = false;
                 if (btr && (isNearHorz(tr, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tr, oTest.x, oTest.y, oTest.height)))
