@@ -42,7 +42,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map5.txt");
+            new Manager("map1(2).txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -218,26 +218,73 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private void genNodes() {
         ArrayList<Node> nodeList = new ArrayList<>(map.obstacles.length * 4);
         Node k1 = null, k2 = null, k3 = null, k4 = null;
+        boolean btl = true, btr = true, bbr = true, bbl = true;
         for (Obstacle o : map.obstacles) {
-            boolean btl = true, btr = true, bbr = true, bbl = true;
+            btl = true;
+            btr = true;
+            bbr = true;
+            bbl = true;
             PointF tl = new PointF(o.x, o.y),
                     tr = new PointF(o.x + o.width, o.y),
                     br = new PointF(o.x + o.width, o.y + o.height),
                     bl = new PointF(o.x, o.y + o.height);
             for (int j = 0; j < map.obstacles.length; j++) {
                 Obstacle oTest = map.obstacles[j];
+                //dünne Wände
                 if (o == oTest)
                     continue;
-                if (btl && (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)))
-                    btl = false;
-                if (btr && (isNearHorz(tr, oTest.y + oTest.height, oTest.x, oTest.width) || isNearVert(tr, oTest.x, oTest.y, oTest.height)))
-                    btr = false;
-                if (bbr && (isNearHorz(br, oTest.y, oTest.x, oTest.width) || isNearVert(br, oTest.x, oTest.y, oTest.height)))
-                    bbr = false;
-                if (bbl && (isNearHorz(bl, oTest.y, oTest.x, oTest.width) || isNearVert(bl, oTest.x + oTest.width, oTest.y, oTest.height)))
-                    bbl = false;
+
+                if (btl)
+                    if (isNearHorz(tl, oTest.y + oTest.height, oTest.x, oTest.width)) {
+                        btl = false;
+                        oTest.setB(false);
+                    } else if (isNearVert(tl, oTest.x + oTest.width, oTest.y, oTest.height)) {
+                        btl = false;
+                        oTest.setR(false);
+                    }
+                if (btr)
+                    if (isNearHorz(tr, oTest.y + oTest.height, oTest.x, oTest.width)) {
+                        btr = false;
+                        oTest.setB(false);
+                    } else if (isNearVert(tr, oTest.x, oTest.y, oTest.height)) {
+                        btr = false;
+                        oTest.setL(false);
+                    }
+                if (bbr)
+                    if (isNearHorz(br, oTest.y, oTest.x, oTest.width)) {
+                        bbr = false;
+                        oTest.setT(false);
+                    } else if (isNearVert(br, oTest.x, oTest.y, oTest.height)) {
+                        bbr = false;
+                        oTest.setL(false);
+                    }
+                if (bbl)
+                    if (isNearHorz(bl, oTest.y, oTest.x, oTest.width)) {
+                        bbl = false;
+                        oTest.setL(false);
+                    } else if (isNearVert(bl, oTest.x + oTest.width, oTest.y, oTest.height)) {
+                        bbl = false;
+                        oTest.setR(false);
+                    }
 
             }
+            o.setTl(btl);
+            o.setTr(btr);
+            o.setBr(bbr);
+            o.setBl(bbl);
+        }
+        for (Obstacle o : map.obstacles) {
+            btl = o.isTl();
+            btr = o.isTr();
+            bbr = o.isBr();
+            bbl = o.isBl();
+
+
+            PointF tl = new PointF(o.x, o.y),
+                    tr = new PointF(o.x + o.width, o.y),
+                    br = new PointF(o.x + o.width, o.y + o.height),
+                    bl = new PointF(o.x, o.y + o.height);
+
             if (btl) {
                 k1 = new Node(tl, o);
                 nodeList.add(k1);
@@ -256,15 +303,15 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             }
 
             if (btl) {
-                if (btr)
+                if (btr && o.isT())
                     k1.addNeighborBoth(k2);
-                if (bbl)
+                if (bbl && o.isL())
                     k1.addNeighborBoth(k4);
             }
             if (bbr) {
-                if (btr)
+                if (btr && o.isR())
                     k3.addNeighborBoth(k2);
-                if (bbl)
+                if (bbl && o.isB())
                     k3.addNeighborBoth(k4);
             }
         }
@@ -540,7 +587,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private String to2Digit(float f) {
         int i = round(f);
         if (i < 10)
-            return "0" + i;
+            return " " + i;
         else
             return "" + i;
     }
