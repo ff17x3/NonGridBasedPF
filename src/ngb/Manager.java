@@ -81,6 +81,15 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 for (Node kNeighbor : nb) // draw all paths
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
+        } else { // draw startP/endP
+            if (startP != null) {
+                g.setColor(C_PATHSTART);
+                g.fillOval(round(startP.x * scale) - circSize / 2, round(startP.y * scale) - circSize / 2, circSize, circSize);
+            }
+            if (endP != null) {
+                g.setColor(C_PATHEND);
+                g.fillOval(round(endP.x * scale) - circSize / 2, round(endP.y * scale) - circSize / 2, circSize, circSize);
+            }
         }
         // draw way
         if (wayAnchor != null) {
