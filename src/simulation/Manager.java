@@ -1,4 +1,4 @@
-package ngb;
+package simulation;
 
 
 import util.*;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 
-import static ngb.ColorFrame.*;
+import static simulation.ColorFrame.*;
 import static java.lang.Math.round;
 
 
@@ -40,7 +40,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private HashSet<Node> closedList = null;
     private Node currNode;
     private boolean algFinished = false;
-    private String help = "---HELP---\nclick for start-/endpoint\nspace: start algorithm\ns: toggle draw string\ni: toggle draw info\nt: toggle step-for-step and path only\np: one step in step-for-step\n---\n";
+    private String help = "---HELP---\nclick for start-/endpoint\nspace: start Algorithm\ns: toggle draw string\ni: toggle draw info\nt: toggle step-for-step and path only\np: one step in step-for-step\n---\n";
 
     private int circSize = 10;
 
@@ -185,7 +185,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                         if (startP != null && endP != null) {
                             new Thread() {
                                 public void run() {
-                                    System.out.println("Starting algorithm..");
+                                    System.out.println("Starting Algorithm..");
                                     long time = System.nanoTime();
                                     genNodes();
                                     finishMatrix();

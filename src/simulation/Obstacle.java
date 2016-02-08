@@ -1,4 +1,4 @@
-package ngb;
+package simulation;
 
 import java.awt.*;
 import java.util.Scanner;

@@ -1,4 +1,4 @@
-package ngb;
+package simulation;
 
 import java.io.File;
 import java.io.FileNotFoundException;

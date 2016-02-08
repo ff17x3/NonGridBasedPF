@@ -1,4 +1,4 @@
-package ngb;
+package simulation;
 
 import javax.swing.*;
 import java.awt.*;
