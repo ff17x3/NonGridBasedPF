@@ -20,7 +20,7 @@ public class Algorithm {
         // generate Node structure from Bundle
         float[][] matrix = map.matrix;
         PointF[] positions = map.nodesPos;
-        byte[] expandDirs = map.expandDir;
+        Byte[] expandDirs = map.expandDir;
 
         int startI = positions.length - 2, endI = positions.length - 1;
 
