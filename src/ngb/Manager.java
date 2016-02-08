@@ -32,7 +32,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private float[][] movementCosts; // TODO indices: startN = length - 2 und endN = length - 1
     private Node startN, endN, wayAnchor = null;
 
-    private int startEndCircSize = 10;
+    private int circSize = 10;
 
     public static void main(String args[]) {
         try {
@@ -59,38 +59,52 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     @Override
     public void draw(Graphics g, float scale) {
         // draw obstacles
-        g.setColor(new Color(0xFFFFFF));
+        g.setColor(new Color(0x4F4F4F));
         g.fillRect(0, 0, round(map.mapWidth * scale), round(map.mapHeight * scale));
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
         // draw nodes
-        g.setColor(new Color(0xFF0000));
-        if (nodes != null)
+        if (nodes != null) {
+            g.setColor(new Color(0xFF0000));
             for (Node k : nodes) {
-                g.fillOval(round(k.pos.x * scale) - startEndCircSize / 2, round(k.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+                g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
                 ArrayList<Node> nb = k.getNeighbors();
                 for (Node kNeighbor : nb)
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
+        }
         // draw start/end
-        g.setColor(new Color(0xFF00FF));
         if (startP != null) {
-            g.fillOval(round(startP.x * scale) - startEndCircSize / 2, round(startP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+            g.setColor(new Color(0xFF00FF));
+            g.fillOval(round(startP.x * scale) - circSize / 2, round(startP.y * scale) - circSize / 2, circSize, circSize);
             if (endP != null)
-                g.fillOval(round(endP.x * scale) - startEndCircSize / 2, round(endP.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+                g.fillOval(round(endP.x * scale) - circSize / 2, round(endP.y * scale) - circSize / 2, circSize, circSize);
         }
         // draw way
         if (wayAnchor != null) {
             g.setColor(new Color(0x0000FF));
             Node l = null;
             for (Node n = wayAnchor; n != null; n = n.getParent()) {
-                g.drawOval(round(n.pos.x * scale) - startEndCircSize / 2, round(n.pos.y * scale) - startEndCircSize / 2, startEndCircSize, startEndCircSize);
+                g.drawOval(round(n.pos.x * scale) - circSize / 2, round(n.pos.y * scale) - circSize / 2, circSize, circSize);
                 if (l != null)
                     g.drawLine(round(n.pos.x * scale), round(n.pos.y * scale), round(l.pos.x * scale), round(l.pos.y * scale));
                 l = n;
             }
         }
+        // draw node indices
+        g.setColor(new Color(0xFFFF00));
+        if (nodes != null) {
+            for (Node k : nodes) {
+                g.drawString(String.valueOf(k.getMatrixIndex()), round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+            }
+        }
+        // draw start/stop indices
+        if (startN != null)
+            g.drawString(String.valueOf(startN.getMatrixIndex()), round(startN.pos.x * scale) + circSize / 2, round(startN.pos.y * scale) + circSize / 2);
+        if (endN != null)
+            g.drawString(String.valueOf(endN.getMatrixIndex()), round(endN.pos.x * scale) + circSize / 2, round(endN.pos.y * scale) + circSize / 2);
+
     }
 
     @Override
