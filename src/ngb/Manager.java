@@ -382,8 +382,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (int i = 0; i < nodes.length; i++) {
             allNodes[i] = nodes[i];
         }
-        allNodes[nodes.length - 2] = startN;
-        allNodes[nodes.length - 1] = endN;
+        allNodes[nodes.length] = startN;
+        allNodes[nodes.length + 1] = endN;
         connectToAllInView(startN, nodes);
         connectToAllInView(endN, nodes);
         testInView(startN, null, endN);
