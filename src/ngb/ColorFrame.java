@@ -9,12 +9,12 @@ import java.awt.*;
 public class ColorFrame extends JFrame {
     public static final Color C_BARRIER = new Color(0x000000),
             C_PATHSTART = new Color(0xff00ff),
-            C_PATHEND = new Color(0xaa00aa),
+            C_PATHEND = new Color(0x990099),
             C_PATH = new Color(0x0000ff),
             C_OPENLIST = new Color(0xffffff),
             C_CLOSEDLIST = new Color(0x000000),
             C_CURRELEM = new Color(0xff7400),
-            C_FONT = new Color(0xFFFF00);
+            C_FONT = new Color(0xffff00);
 
     public ColorFrame() {
         super();
