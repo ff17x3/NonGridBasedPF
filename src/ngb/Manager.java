@@ -445,9 +445,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 frame.redraw();
                 synchronized (this) {
                     try {
-                        System.out.println("wait now");
+//                        System.out.println("wait now");
                         wait();
-                        System.out.println("notified");
+//                        System.out.println("notified");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
