@@ -36,7 +36,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map4.txt");
+            new Manager("map3.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -360,7 +360,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             movementCosts[endIndex][nb.getMatrixIndex()] = mc;
             movementCosts[nb.getMatrixIndex()][endIndex] = mc;
         }
-
+        printMatrix();
         // heuristic, linear
         for (Node k : nodes) {
             float dX = k.pos.x - startP.x, dY = k.pos.y - startP.y;
@@ -403,6 +403,35 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
         // no possible way :(
         return null;
+    }
+
+    private void printMatrix() {
+        System.out.print("      ");
+        for (int i = 0; i < movementCosts.length; i++) {
+            System.out.print(to2Digit(i) + " | ");
+        }
+        System.out.println();
+        System.out.print("______");
+        for (int i = 0; i < movementCosts.length; i++) {
+            System.out.print("_____");
+        }
+        System.out.println();
+        for (int i = 0; i < movementCosts.length; i++) {
+            System.out.print(to2Digit(i) + "::  ");
+            for (int j = 0; j < movementCosts[i].length; j++) {
+                System.out.print(to2Digit(movementCosts[i][j] * 10) + " | ");
+            }
+            System.out.println();
+        }
+
+    }
+
+    private String to2Digit(float f) {
+        int i = round(f);
+        if (i < 10)
+            return "0" + i;
+        else
+            return "" + i;
     }
 
     /**
