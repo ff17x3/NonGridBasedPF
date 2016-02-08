@@ -103,8 +103,10 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             }
         }
         // draw node values, list member markers, etc
-        if (nodes != null) {
+        if (allNodes != null) {
             for (Node k : allNodes) {
+                if (k == null)
+                    continue;
                 // draw info String
                 g.setColor(C_FONT);
                 String info = String.valueOf(k.getMatrixIndex());
@@ -145,7 +147,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
-                System.out.println("KeyChar: '" + e.getKeyChar() + "'" + " keyCode:" + e.getKeyCode());
+//                System.out.println("KeyChar: '" + e.getKeyChar() + "'" + " keyCode:" + e.getKeyCode());
                 switch (e.getKeyChar()) {
                     case ' ':
                         if (startP != null && endP != null) {
@@ -327,16 +329,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
     }
 
-    private float getAngle(float dx, float dy) {
-        float m = dy / dx, tempAngle;
-        if (dx < 0)
-            tempAngle = (float) (Math.atan(m) + Math.PI);
-        else if (dy < 0)
-            tempAngle = (float) (Math.atan(m) + Math.PI * 2);
-        else
-            tempAngle = (float) (Math.atan(m));
-        return tempAngle;
-    }
 
     private boolean intsHozLine(float m, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
         /**horizontal col. detection:
