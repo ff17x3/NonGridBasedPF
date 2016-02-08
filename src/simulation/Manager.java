@@ -25,7 +25,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     public static final float MIN_PATH_WIDTH = 0.15f;
 
     //Params
-    private boolean drawInfo = true, drawString = false, drawNodes = false, stepforstep = false, printMatrix = false;
+    private boolean drawInfo = true, drawString = false, drawNodes = false, stepforstep = false, printMatrix = true;
 
 
     private Map map;
@@ -46,7 +46,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map5.txt");
+            new Manager("map3.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -502,7 +502,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             movementCosts[nb.getMatrixIndex()][endIndex] = mc;
         }
         if (printMatrix)
-            printMatrix();
+            printMatrix(movementCosts);
         // heuristic, linear
         for (Node k : nodes) {
             float dX = k.pos.x - startP.x, dY = k.pos.y - startP.y;
@@ -574,7 +574,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         System.out.println();
     }
 
-    private void printMatrix() {
+    public static void printMatrix(float[][] movementCosts) {
         System.out.println("Matrix: ");
 
         System.out.print("      ");
@@ -597,7 +597,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     }
 
-    private String to2Digit(float f) {
+    private static String to2Digit(float f) {
         int i = round(f);
         if (i < 10)
             return " " + i;

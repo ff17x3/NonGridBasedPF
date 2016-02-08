@@ -109,10 +109,10 @@ public class Algorithm {
 
 
     public static MatrixPosBundle genMap(Obstacle[] obstacles) {
-        return null;
+        return genNodes(obstacles);
     }
 
-    private void genNodes(Obstacle[] obstacles) {
+    private static MatrixPosBundle genNodes(Obstacle[] obstacles) {
         ArrayList<PointF> coordsList = new ArrayList<>(obstacles.length * 4);
         ArrayList<Byte> expDirList = new ArrayList<>(obstacles.length * 4);
         ArrayList<Obstacle> obs = new ArrayList<>(obstacles.length * 4);
@@ -257,25 +257,27 @@ public class Algorithm {
         //finish matrix (add connetion to matrix)---------------------------------------------
 
 
-        for (int i = 0; i < points.length; i++) {
-            for (int j = 0; j < points.length; j++) {
+        for (int i = 0; i < points.length - 2; i++) {
+            for (int j = 0; j < points.length - 2; j++) {
                 testInView(points, obs, j, i, obstacles, matrix);
             }
         }
 
+        return new MatrixPosBundle(matrix, points, dirs);
+
     }
 
-    private boolean isNearHorz(PointF p, float yLine, float xStart, float width) {
+    private static boolean isNearHorz(PointF p, float yLine, float xStart, float width) {
         return (between(p.x, xStart - MIN_PATH_WIDTH, xStart + width + MIN_PATH_WIDTH)
                 && between(p.y, yLine - MIN_PATH_WIDTH, yLine + MIN_PATH_WIDTH));
     }
 
-    private boolean isNearVert(PointF p, float xLine, float yStart, float height) {
+    private static boolean isNearVert(PointF p, float xLine, float yStart, float height) {
         return (between(p.x, xLine - MIN_PATH_WIDTH, xLine + MIN_PATH_WIDTH)
                 && between(p.y, yStart - MIN_PATH_WIDTH, yStart + height + MIN_PATH_WIDTH));
     }
 
-    private float calcMoveCost(PointF a, PointF b) {
+    private static float calcMoveCost(PointF a, PointF b) {
         return (float) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
@@ -285,19 +287,23 @@ public class Algorithm {
 //        }
 //    }
 
-    private void testInView(PointF[] points, ArrayList<Obstacle> obs, int indexEnd, int indexStart, Obstacle[] obstacles, float[][] matrix) {
+    private static void testInView(PointF[] points, ArrayList<Obstacle> obs, int indexEnd, int indexStart, Obstacle[] obstacles, float[][] matrix) {
         float dx, dy;
         boolean hits = false;
         PointF pStart = points[indexStart];
         PointF pEnd = points[indexEnd];
-        Obstacle oEnd = obs.get(indexEnd);
-        Obstacle oStart = obs.get(indexStart);
-        if (indexStart == indexEnd && oStart != null)
+
+        if (indexStart == indexEnd && indexStart < obs.size())
             return;
+
+        Obstacle oEnd = null, oStart = null;
+        if (indexEnd < obs.size()) {
+            oEnd = obs.get(indexEnd);
+            oStart = obs.get(indexStart);
+        }
+
         for (Obstacle oCol : obstacles) {
 
-            if (pEnd.x == 1 && pEnd.y == 6 && pEnd.x == 1 && pEnd.y == 1 && oCol.width == 3)
-                System.out.println("bgb");
 
             dx = pEnd.x - pEnd.x;
             dy = pEnd.y - pEnd.y;
@@ -342,11 +348,11 @@ public class Algorithm {
         }
     }
 
-    private boolean isOn(PointF p, float x, float y) {
+    private static boolean isOn(PointF p, float x, float y) {
         return p.x == x && p.y == y;
     }
 
-    private boolean intsHozLine(float m, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
+    private static boolean intsHozLine(float m, float yB, float xB, float widthB, float posEndXRel, float posEndYRel) {
         /**horizontal col. detection:
          * A: line: y=m*x
          * B: y = a
@@ -356,7 +362,7 @@ public class Algorithm {
         return between(sx, xB, xB + widthB) && between(sx, 0, posEndXRel) && between(yB, 0, posEndYRel);
     }
 
-    private boolean intsVerLine(float m, float xB, float yB, float heightB, float posEndXRel, float posEndYRel) {
+    private static boolean intsVerLine(float m, float xB, float yB, float heightB, float posEndXRel, float posEndYRel) {
         /**vertical col. detection:
          * A: line: y=m*x
          * B: x = a
@@ -366,23 +372,20 @@ public class Algorithm {
         return between(sy, yB, yB + heightB) && between(sy, 0, posEndYRel) && between(xB, 0, posEndXRel);
     }
 
-    private boolean between(float a, float x1, float x2) {
+    private static boolean between(float a, float x1, float x2) {
         if (x1 < x2)
             return a >= x1 && a <= x2;
         else
             return a >= x2 && a <= x1;
     }
 
-    private float intersectPointVer(float gradientA, float xB) {
+    private static float intersectPointVer(float gradientA, float xB) {
         return xB * gradientA;
     }
 
-    private float intersectPointHoz(float gradientA, float yB) {
+    private static float intersectPointHoz(float gradientA, float yB) {
         return yB / gradientA;
     }
 
-    private float getGradientfromAngle(float angle) {
-        return (float) Math.tan(angle);
-    }
 
 }
