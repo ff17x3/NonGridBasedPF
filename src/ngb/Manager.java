@@ -28,7 +28,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private util.ClockNano clock;
     private PointF startP = null, endP = null;
 
-    private Node[] nodes;
+    private Node[] nodes, allNodes;
     private float[][] movementCosts; // TODO indices: startN = length - 2 und endN = length - 1
     private Node startN, endN, wayAnchor = null;
     private TreeMap<Float, Node> openList = null;
@@ -370,6 +370,12 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         // get connections to new start/end
         startN = new Node(startP, null);
         endN = new Node(endP, null);
+        allNodes = new Node[nodes.length + 2];
+        for (int i = 0; i < nodes.length; i++) {
+            allNodes[i] = nodes[i];
+        }
+        allNodes[nodes.length - 2] = startN;
+        allNodes[nodes.length - 1] = endN;
         connectToAllInView(startN, nodes);
         connectToAllInView(endN, nodes);
         testInView(startN, null, endN);
@@ -451,6 +457,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (Node n : nodes) {
             System.out.print(to2Digit(n.getHeuristic() * 10) + " | ");
         }
+        System.out.println();
     }
 
     private void printMatrix() {
