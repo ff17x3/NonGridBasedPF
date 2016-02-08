@@ -141,6 +141,11 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                             dp.repaint();
                         }
                         break;
+                    case 'p':
+                        synchronized (Manager.this) {
+                            Manager.this.notify();
+                        }
+                        break;
                 }
             }
         });
@@ -427,7 +432,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
         System.out.println();
         for (Node n : nodes) {
-            System.out.print(to2Digit(n.getHeuristic()) + " | ");
+            System.out.print(to2Digit(n.getHeuristic() * 10) + " | ");
         }
     }
 
