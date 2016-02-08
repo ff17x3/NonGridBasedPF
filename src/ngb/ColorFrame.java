@@ -14,13 +14,21 @@ public class ColorFrame extends JFrame {
             C_OPENLIST = new Color(0xffffff),
             C_CLOSEDLIST = new Color(0x000000),
             C_CURRELEM = new Color(0xff7400),
-            C_FONT = new Color(0xffff00);
+            C_FONT = new Color(0xffff00),
+            C_NODE = new Color(0xff0000);
 
     public ColorFrame() {
         super();
         JPanel pan = new JPanel();
         pan.setLayout(new GridLayout(0, 1));
         int fontsize = 16;
+
+        JLabel node = new JLabel("  Node");
+        node.setBackground(C_NODE);
+        node.setFont(new Font("Calibri", Font.PLAIN, fontsize));
+        node.setForeground(C_FONT);
+        node.setOpaque(true);
+        pan.add(node);
 
         JLabel barrier = new JLabel("  Barrier");
         barrier.setBackground(C_BARRIER);
