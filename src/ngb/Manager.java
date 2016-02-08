@@ -71,13 +71,16 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         // draw nodes and paths
         if (nodes != null) {
             for (Node k : nodes) {
-                g.setColor(C_NODE);
+
                 if (k == startN)
                     g.setColor(C_PATHSTART);
-                if (k == endN)
+                else if (k == endN)
                     g.setColor(C_PATHEND);
+                else
+                    g.setColor(C_NODE);
                 g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
                 ArrayList<Node> nb = k.getNeighbors();
+                g.setColor(C_NODE);
                 for (Node kNeighbor : nb) // draw all paths
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
