@@ -24,6 +24,10 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static final float MIN_PATH_WIDTH = 0.15f;
 
+    //Params
+    private boolean drawInfo = true, drawString = false, drawNodes = false, stepforstep = false, printMatrix = false;
+
+
     private Map map;
     private DrawFrame frame;
     private util.ClockNano clock;
@@ -35,7 +39,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private TreeMap<Float, Node> openList = null;
     private HashSet<Node> closedList = null;
     private Node currNode;
-    private boolean drawInfo = false, drawString = false, stepforstep = false, algFinished = false;
+    private boolean algFinished = false;
     private String help = "---HELP---\nclick for start-/endpoint\nspace: start algorithm\ns: toggle draw string\ni: toggle draw info\nt: toggle step-for-step and path only\np: one step in step-for-step\n---\n";
 
     private int circSize = 10;
@@ -75,7 +79,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             o.draw(g, scale);
         }
         // draw nodes and paths
-        if (allNodes != null) {
+
+        if (drawNodes && allNodes != null) {
+
             for (Node k : allNodes) {
                 if (k == null) {
                     System.out.println("a node is null");
@@ -108,7 +114,8 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             g.setColor(C_PATH);
             Node l = null;
             for (Node n = wayAnchor; n != null; n = n.getParent()) {
-                g.drawOval(round(n.pos.x * scale) - circSize / 2, round(n.pos.y * scale) - circSize / 2, circSize, circSize);
+                if (drawNodes)
+                    g.drawOval(round(n.pos.x * scale) - circSize / 2, round(n.pos.y * scale) - circSize / 2, circSize, circSize);
                 if (l != null)
                     g.drawLine(round(n.pos.x * scale), round(n.pos.y * scale), round(l.pos.x * scale), round(l.pos.y * scale));
                 l = n;
@@ -261,7 +268,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 if (bbl)
                     if (isNearHorz(bl, oTest.y, oTest.x, oTest.width)) {
                         bbl = false;
-                        oTest.setL(false);
+                        oTest.setT(false);
                     } else if (isNearVert(bl, oTest.x + oTest.width, oTest.y, oTest.height)) {
                         bbl = false;
                         oTest.setR(false);
@@ -388,25 +395,29 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             float endX = kEnd.pos.x - kStart.pos.x;
             float endY = kEnd.pos.y - kStart.pos.y;
             if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y)
-                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y))) {
+                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y)
+                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.x == kStart.pos.x)))) {
                 hits = intsHozLine(mRay, oCol.y - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX, endY);
                 if (hits)
                     break;
             }
             if (!(kStart.isOn(oCol.x, oCol.y + oCol.height) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                    || kEnd.isOn(oCol.x, oCol.y + oCol.height) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
+                    || kEnd.isOn(oCol.x, oCol.y + oCol.height) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
+                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.x == kStart.pos.x)))) {
                 hits = intsHozLine(mRay, oCol.y + oCol.height - kStart.pos.y, oCol.x - kStart.pos.x, oCol.width, endX, endY);
                 if (hits)
                     break;
             }
             if (!(kStart.isOn(oCol.x, oCol.y) || kStart.isOn(oCol.x, oCol.y + oCol.height)
-                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x, oCol.y + oCol.height))) {
+                    || kEnd.isOn(oCol.x, oCol.y) || kEnd.isOn(oCol.x, oCol.y + oCol.height)
+                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.y == kStart.pos.y)))) {
                 hits = intsVerLine(mRay, oCol.x - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endX, endY);
                 if (hits)
                     break;
             }
             if (!(kStart.isOn(oCol.x + oCol.width, oCol.y) || kStart.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
-                    || kEnd.isOn(oCol.x + oCol.width, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height))) {
+                    || kEnd.isOn(oCol.x + oCol.width, oCol.y) || kEnd.isOn(oCol.x + oCol.width, oCol.y + oCol.height)
+                    || ((oCol == oStart || oCol == oEnd) && (kEnd.pos.y == kStart.pos.y)))) {
                 hits = intsVerLine(mRay, oCol.x + oCol.width - kStart.pos.x, oCol.y - kStart.pos.y, oCol.height, endX, endY);
                 if (hits)
                     break;
@@ -440,7 +451,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     }
 
     private boolean between(float a, float x1, float x2) {
-        if (x1 <= x2)
+        if (x1 < x2)
             return a >= x1 && a <= x2;
         else
             return a >= x2 && a <= x1;
@@ -490,13 +501,15 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             movementCosts[endIndex][nb.getMatrixIndex()] = mc;
             movementCosts[nb.getMatrixIndex()][endIndex] = mc;
         }
-        printMatrix();
+        if (printMatrix)
+            printMatrix();
         // heuristic, linear
         for (Node k : nodes) {
             float dX = k.pos.x - startP.x, dY = k.pos.y - startP.y;
             k.setHeuristic((float) Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2)));
         }
-        printHeuristic();
+        if (printMatrix)
+            printHeuristic();
         // a*-Algorithm
         openList = new TreeMap<>();
         closedList = new HashSet<>();
