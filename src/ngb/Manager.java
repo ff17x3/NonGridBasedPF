@@ -42,7 +42,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
 
     public static void main(String args[]) {
         try {
-            new Manager("map1(2).txt");
+            new Manager("map5.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
