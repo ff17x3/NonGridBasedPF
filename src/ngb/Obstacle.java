@@ -3,6 +3,7 @@ package ngb;
 import java.awt.*;
 import java.util.Scanner;
 
+//max1
 public class Obstacle {
 
     public final float x, y, width, height;
