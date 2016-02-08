@@ -1,7 +1,7 @@
 package raw;
 
 
-import simulation.Obstacle;//TODO
+import simulation.Obstacle;
 import util.PointF;
 
 import java.util.ArrayList;
