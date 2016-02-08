@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 
+import static ngb.ColorFrame.*;
 import static java.lang.Math.round;
 
 
@@ -69,24 +70,21 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
         // draw nodes and paths
         if (nodes != null) {
-            g.setColor(new Color(0xFF0000));
             for (Node k : nodes) {
+                g.setColor(C_NODE);
+                if (k == startN)
+                    g.setColor(C_PATHSTART);
+                if (k == endN)
+                    g.setColor(C_PATHEND);
                 g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
                 ArrayList<Node> nb = k.getNeighbors();
                 for (Node kNeighbor : nb) // draw all paths
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
         }
-        // draw start/end
-        if (startP != null) {
-            g.setColor(new Color(0xFF00FF));
-            g.fillOval(round(startP.x * scale) - circSize / 2, round(startP.y * scale) - circSize / 2, circSize, circSize);
-            if (endP != null)
-                g.fillOval(round(endP.x * scale) - circSize / 2, round(endP.y * scale) - circSize / 2, circSize, circSize);
-        }
         // draw way
         if (wayAnchor != null) {
-            g.setColor(new Color(0x0000FF));
+            g.setColor(C_PATH);
             Node l = null;
             for (Node n = wayAnchor; n != null; n = n.getParent()) {
                 g.drawOval(round(n.pos.x * scale) - circSize / 2, round(n.pos.y * scale) - circSize / 2, circSize, circSize);
@@ -95,21 +93,23 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 l = n;
             }
         }
-        // draw node indices, list member markers, etc
+        // draw node values, list member markers, etc
         if (nodes != null) {
             for (Node k : allNodes) {
-                g.setColor(new Color(0xFFFF00));
-                g.drawString(String.valueOf(k.getMatrixIndex()), round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+                // draw info String
+                g.setColor(C_FONT);
+                String info = String.valueOf(k.getMatrixIndex());
+                g.drawString(info, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
                 if (openList.get(k.getF()) != null) { // is in openList
-                    g.setColor(Color.WHITE);
+                    g.setColor(C_OPENLIST);
                     g.drawOval(round(k.pos.x * scale) - circSize / 4, round(k.pos.y * scale) - circSize / 4, circSize / 2, circSize / 2);
                 }
                 if (closedList.contains(k)) { // is in closedList
-                    g.setColor(Color.BLACK);
+                    g.setColor(C_CLOSEDLIST);
                     g.drawOval(round(k.pos.x * scale) - circSize / 4, round(k.pos.y * scale) - circSize / 4, circSize / 2, circSize / 2);
                 }
-                if (k == currNode) {
-                    g.setColor(new Color(0xFF7400));
+                if (k == currNode) { // is current node
+                    g.setColor(C_CURRELEM);
                     g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
                 }
             }
