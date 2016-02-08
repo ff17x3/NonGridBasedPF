@@ -31,6 +31,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
     private Node[] nodes;
     private float[][] movementCosts; // TODO indices: startN = length - 2 und endN = length - 1
     private Node startN, endN, wayAnchor = null;
+    private TreeMap<Float, Node> openList = null;
+    private HashSet<Node> closedList = null;
+    private Node currNode;
 
     private int circSize = 10;
 
@@ -64,13 +67,13 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         for (Obstacle o : map.obstacles) {
             o.draw(g, scale);
         }
-        // draw nodes
+        // draw nodes and paths
         if (nodes != null) {
             g.setColor(new Color(0xFF0000));
             for (Node k : nodes) {
                 g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
                 ArrayList<Node> nb = k.getNeighbors();
-                for (Node kNeighbor : nb)
+                for (Node kNeighbor : nb) // draw all paths
                     g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale), round(kNeighbor.pos.x * scale), round(kNeighbor.pos.y * scale));
             }
         }
@@ -92,19 +95,25 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 l = n;
             }
         }
-        // draw node indices
-        g.setColor(new Color(0xFFFF00));
+        // draw node indices, list member markers, etc
         if (nodes != null) {
-            for (Node k : nodes) {
+            for (Node k : allNodes) {
+                g.setColor(new Color(0xFFFF00));
                 g.drawString(String.valueOf(k.getMatrixIndex()), round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+                if (openList.get(k.getF()) != null) { // is in openList
+                    g.setColor(Color.WHITE);
+                    g.drawOval(round(k.pos.x * scale) - circSize / 4, round(k.pos.y * scale) - circSize / 4, circSize / 2, circSize / 2);
+                }
+                if (closedList.contains(k)) { // is in closedList
+                    g.setColor(Color.BLACK);
+                    g.drawOval(round(k.pos.x * scale) - circSize / 4, round(k.pos.y * scale) - circSize / 4, circSize / 2, circSize / 2);
+                }
+                if (k == currNode) {
+                    g.setColor(new Color(0xFF7400));
+                    g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
+                }
             }
         }
-        // draw start/stop indices
-        if (startN != null)
-            g.drawString(String.valueOf(startN.getMatrixIndex()), round(startN.pos.x * scale) + circSize / 2, round(startN.pos.y * scale) + circSize / 2);
-        if (endN != null)
-            g.drawString(String.valueOf(endN.getMatrixIndex()), round(endN.pos.x * scale) + circSize / 2, round(endN.pos.y * scale) + circSize / 2);
-
     }
 
     @Override
@@ -382,10 +391,9 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
         }
         printHeuristic();
         // a*-Algorithm
-        TreeMap<Float, Node> openList = new TreeMap<>();
-        HashSet<Node> closedList = new HashSet<>();
+        openList = new TreeMap<>();
+        closedList = new HashSet<>();
 
-        Node currNode;
         openList.put(0f, endN);
         while (!openList.isEmpty()) {
             currNode = openList.remove(openList.firstKey());
@@ -414,6 +422,15 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 neighbor.setF(newF);
                 neighbor.setG(newG);
                 neighbor.setParent(currNode); // noch restliche Zuweisungen
+
+                frame.redraw();
+                synchronized (this) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         // no possible way :(
