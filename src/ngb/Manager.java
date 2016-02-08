@@ -441,7 +441,7 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                     openList.remove(neighbor.getF());
                 }
                 // neuen F-Wert für neighbor und für diesen Weg bestimmen
-                float newF = newG + currNode.getHeuristic();
+                float newF = newG + neighbor.getHeuristic();
                 openList.put(newF, neighbor);
                 neighbor.setF(newF);
                 neighbor.setG(newG);
