@@ -69,9 +69,12 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
             o.draw(g, scale);
         }
         // draw nodes and paths
-        if (nodes != null) {
-            for (Node k : nodes) {
-
+        if (allNodes != null) {
+            for (Node k : allNodes) {
+                if (k == null) {
+                    System.out.println("a node is null");
+                    continue;
+                }
                 if (k == startN)
                     g.setColor(C_PATHSTART);
                 else if (k == endN)
@@ -114,6 +117,12 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 g.setColor(C_FONT);
                 String info = String.valueOf(k.getMatrixIndex());
                 g.drawString(info, round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale) + circSize / 2);
+
+                if (k == currNode) { // is current node
+                    g.setColor(C_CURRELEM);
+                    g.drawLine(round(k.pos.x * scale), round(k.pos.y * scale) - circSize / 2, round(k.pos.x * scale), round(k.pos.y * scale) + circSize / 2);
+                    g.drawLine(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale), round(k.pos.x * scale) + circSize / 2, round(k.pos.y * scale));
+                }
                 if (openList.get(k.getF()) != null) { // is in openList
                     g.setColor(C_OPENLIST);
                     g.drawOval(round(k.pos.x * scale) - circSize / 4, round(k.pos.y * scale) - circSize / 4, circSize / 2, circSize / 2);
@@ -121,10 +130,6 @@ public class Manager implements DrawInferface, FrameInitInterface, Tickable {
                 if (closedList.contains(k)) { // is in closedList
                     g.setColor(C_CLOSEDLIST);
                     g.drawOval(round(k.pos.x * scale) - circSize / 4, round(k.pos.y * scale) - circSize / 4, circSize / 2, circSize / 2);
-                }
-                if (k == currNode) { // is current node
-                    g.setColor(C_CURRELEM);
-                    g.fillOval(round(k.pos.x * scale) - circSize / 2, round(k.pos.y * scale) - circSize / 2, circSize, circSize);
                 }
             }
         }
