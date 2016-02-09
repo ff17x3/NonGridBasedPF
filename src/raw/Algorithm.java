@@ -108,7 +108,7 @@ public class Algorithm {
     public static final float MIN_PATH_WIDTH = 0.15f;
 
 
-    private static MatrixPosBundle genMap(Obstacle[] obstacles) {
+    public static MatrixPosBundle genMap(Obstacle[] obstacles) {
         ArrayList<PointF> coordsList = new ArrayList<>(obstacles.length * 4);
         ArrayList<Byte> expDirList = new ArrayList<>(obstacles.length * 4);
         ArrayList<Obstacle> obs = new ArrayList<>(obstacles.length * 4);
@@ -263,6 +263,13 @@ public class Algorithm {
 
     }
 
+    public static void addStartEndPoints(PointF start, PointF end, MatrixPosBundle bundle, Obstacle[] obstacles) {
+        bundle.nodesPos[bundle.nodesPos.length - 2] = start;
+        bundle.nodesPos[bundle.nodesPos.length - 1] = end;
+        connectToAllInView(start, bundle.nodesPos, obstacles, bundle.matrix);
+        connectToAllInView(end, bundle.nodesPos, obstacles, bundle.matrix);
+    }
+
     private static boolean isNearHorz(PointF p, float yLine, float xStart, float width) {
         return (between(p.x, xStart - MIN_PATH_WIDTH, xStart + width + MIN_PATH_WIDTH)
                 && between(p.y, yLine - MIN_PATH_WIDTH, yLine + MIN_PATH_WIDTH));
@@ -304,7 +311,7 @@ public class Algorithm {
 
     }
 
-    public static void testInView(PointF pStart, PointF pEnd, Obstacle[] obstacles, Obstacle oStart, Obstacle oEnd, float[][] matrix, int matrixIndex1, int matrixIndex2) {
+    private static void testInView(PointF pStart, PointF pEnd, Obstacle[] obstacles, Obstacle oStart, Obstacle oEnd, float[][] matrix, int matrixIndex1, int matrixIndex2) {
 
         if (pStart == pEnd)
             return;
@@ -358,12 +365,6 @@ public class Algorithm {
 
     }
 
-    public static void addStartEndPoints(PointF start, PointF end, MatrixPosBundle bundle, Obstacle[] obstacles) {
-        bundle.nodesPos[bundle.nodesPos.length - 2] = start;
-        bundle.nodesPos[bundle.nodesPos.length - 1] = end;
-        connectToAllInView(start, bundle.nodesPos, obstacles, bundle.matrix);
-        connectToAllInView(end, bundle.nodesPos, obstacles, bundle.matrix);
-    }
 
     private static boolean isOn(PointF p, float x, float y) {
         return p.x == x && p.y == y;
