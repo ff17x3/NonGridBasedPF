@@ -108,11 +108,7 @@ public class Algorithm {
     public static final float MIN_PATH_WIDTH = 0.15f;
 
 
-    public static MatrixPosBundle genMap(Obstacle[] obstacles) {
-        return genNodes(obstacles);
-    }
-
-    private static MatrixPosBundle genNodes(Obstacle[] obstacles) {
+    private static MatrixPosBundle genMap(Obstacle[] obstacles) {
         ArrayList<PointF> coordsList = new ArrayList<>(obstacles.length * 4);
         ArrayList<Byte> expDirList = new ArrayList<>(obstacles.length * 4);
         ArrayList<Obstacle> obs = new ArrayList<>(obstacles.length * 4);
@@ -281,15 +277,18 @@ public class Algorithm {
         return (float) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
-//    private void connectToAllInView(Node kStart, Node[] rest) {
-//        for (Node kEnd : rest) {
-//            testInView(kEnd, null, kStart);
-//        }
-//    }
+    private static void connectToAllInView(PointF p, PointF[] others, Obstacle[] obstacles, float[][] matrix) {
+        for (PointF pEnd : others) {
+            testInView(p, pEnd, obstacles, matrix);
+        }
+    }
+
+    private static void testInView(PointF p, PointF pEnd, Obstacle[] obstacles, float[][] matrix) {
+        testInView(p, pEnd, obstacles, null, null, matrix, matrix.length - 2, matrix.length - 1);
+    }
 
     private static void testInView(PointF[] points, ArrayList<Obstacle> obs, int indexEnd, int indexStart, Obstacle[] obstacles, float[][] matrix) {
-        float dx, dy;
-        boolean hits = false;
+
         PointF pStart = points[indexStart];
         PointF pEnd = points[indexEnd];
 
@@ -301,7 +300,17 @@ public class Algorithm {
             oEnd = obs.get(indexEnd);
             oStart = obs.get(indexStart);
         }
+        testInView(pStart, pEnd, obstacles, oStart, oEnd, matrix, indexStart, indexEnd);
 
+    }
+
+    public static void testInView(PointF pStart, PointF pEnd, Obstacle[] obstacles, Obstacle oStart, Obstacle oEnd, float[][] matrix, int matrixIndex1, int matrixIndex2) {
+
+        if (pStart == pEnd)
+            return;
+
+        float dx, dy;
+        boolean hits = false;
         for (Obstacle oCol : obstacles) {
 
 
@@ -343,9 +352,17 @@ public class Algorithm {
         }
         if (!hits) {
             float cache = calcMoveCost(pStart, pEnd);
-            matrix[indexEnd][indexStart] = cache;
-            matrix[indexStart][indexEnd] = cache;
+            matrix[matrixIndex1][matrixIndex2] = cache;
+            matrix[matrixIndex2][matrixIndex1] = cache;
         }
+
+    }
+
+    public static void addStartEndPoints(PointF start, PointF end, MatrixPosBundle bundle, Obstacle[] obstacles) {
+        bundle.nodesPos[bundle.nodesPos.length - 2] = start;
+        bundle.nodesPos[bundle.nodesPos.length - 1] = end;
+        connectToAllInView(start, bundle.nodesPos, obstacles, bundle.matrix);
+        connectToAllInView(end, bundle.nodesPos, obstacles, bundle.matrix);
     }
 
     private static boolean isOn(PointF p, float x, float y) {
